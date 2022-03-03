@@ -34,34 +34,7 @@
                                  placeholder="Correo electrónico"
                                  required
                               ></v-text-field>
-
-                              <v-text-field
-                                 v-model="password"
-                                 name="psswd"
-                                 label="Constraseña"
-                                 type="password"
-                                 placeholder="Constraseña"
-                                 required
-                              ></v-text-field>
-
-                              <v-text-field
-                                 v-model="password2"
-                                 name="psswd2"
-                                 label="Repite contraseña"
-                                 type="password"
-                                 placeholder="Repite contraseña"
-                                 required
-                              ></v-text-field>
-
-                              <v-text-field
-                                 v-model="codemp"
-                                 name="idEmp"
-                                 label="Código de empresa"
-                                 type="text"
-                                 placeholder="Código de empresa"
-                                 required
-                              ></v-text-field>
-                           <v-btn type="submit" class="mt-4"  dark color="secondary" value="log in">Register</v-btn>
+                           <v-btn  @click="registraUsuario" type="submit" class="mt-4"  dark color="secondary" value="registerUsu">Register</v-btn>
                            </form>
                         </v-card-text>
                      </v-card>
@@ -115,7 +88,7 @@
                                     placeholder="Actividades de la empresa"
                                     required
                                  ></v-text-field>
-                                 <v-btn type="submit" class="mt-4" color="primary" value="log in">Register</v-btn>
+                                 <v-btn @click="registraEmpresa" type="submit" class="mt-4" dark color="secondary" value="registerEmp">Register</v-btn>
                               </form>
                            </v-card-text>
                         </v-card>
@@ -129,9 +102,15 @@
 
 <script>
 
-//Importamos las funciones que hemos creado para trabajar con firebase
-
-//import { crearUsuario } from '@/main.js'
-
-
+export default({
+    name: 'Registro',
+    methods:{
+        registraUsuario(){
+            console.log("Se registro el usuario");
+        },
+         registraEmpresa(){
+            console.log("Se registro la empresa");
+        }
+    }
+})
 </script>

@@ -1,19 +1,11 @@
 <template>
   <v-app>
     <div id="app">
-      <v-layout justify-center>
-         <v-app-bar color="primary">
-                  <router-link to="/">
-                    <v-img max-height="100" max-width="123" src='./images/gececo.jpg'></v-img>
-                  </router-link>
-                  <div>
-                  <router-link to="/login">
-                    <v-btn dark color="black">LOGIN</v-btn>
-                  </router-link> 
-                  <router-link to="/register">
-                    <v-btn dark color="black">REGISTRATE</v-btn>
-                  </router-link>
-                  </div>
+      <v-layout>
+         <v-app-bar color="secondary">
+                    <router-link to="/">
+                      <v-img max-height="50" max-width="50" src='./images/Gececo.jpg'></v-img>
+                    </router-link>
         </v-app-bar>
       </v-layout>
       <router-view/>
