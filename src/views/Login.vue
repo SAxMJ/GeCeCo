@@ -25,9 +25,14 @@
                                  placeholder="Contraseña"
                                  required
                               ></v-text-field>
-                           <v-btn @click="loginUsuario" type="submit" class="mt-4"  dark color="secondary" value="login">LOGIN</v-btn>
+                               <router-link to="/paginainicio">
+                                 <v-btn @click="loginUsuario" class="mt-4"  dark color="secondary" value="login">LOGIN</v-btn>
+                              </router-link>
                            </form>
                         </v-card-text>
+                        <v-alert dense outlined type="error" v-if="error">
+                              {{error}}
+                           </v-alert>
                      </v-card>
                      </v-tab-item>
                </v-tabs>
@@ -37,20 +42,45 @@
    </v-container>
 </template>
 
-<!--
-La declaración export se utiliza al crear módulos de JavaScript para exportar funciones, 
-objetos o tipos de dato primitivos del módulo para que puedan ser utilizados por otros programas con la sentencia import.
-!--> 
-
 <script>
 
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
 export default({
+   data(){
+      return{
+         correo: '',
+         password: '',
+         error: ''
+      }
+   },
     name: 'Login',
     methods:{
          loginUsuario(){
-            console.log("Usuario logueado");
+
+            if(this.correo && this.password){
+               
+               this.error='';
+               const auth=getAuth();
+
+               signInWithEmailAndPassword(auth,this.correo,this.password).then((userCredential)=>{
+                  const user=userCredential.user;
+                  console.log(user);
+
+               }).catch((error)=>{
+                  const errorCode=error.errorCode;
+                  const errorMesage=error.message;
+
+                  console.log(errorCode);
+                  console.log(errorMesage);
+               })
+            }
+             else{
+               this.error='Introduce tus datos'
+            }
         }
     }
 })
+
 </script>
 

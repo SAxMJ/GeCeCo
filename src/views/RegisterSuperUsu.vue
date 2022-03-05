@@ -34,7 +34,7 @@
                                  placeholder="Correo electrónico"
                                  required
                               ></v-text-field>
-                           <v-btn  @click="registraUsuario" type="submit" class="mt-4"  dark color="secondary" value="registerUsu">Register</v-btn>
+                           <v-btn  @click="registraUsuario" class="mt-4"  dark color="secondary" value="registerUsu">Register</v-btn>
                            </form>
                         </v-card-text>
                      </v-card>
@@ -88,7 +88,7 @@
                                     placeholder="Actividades de la empresa"
                                     required
                                  ></v-text-field>
-                                 <v-btn @click="registraEmpresa" type="submit" class="mt-4" dark color="secondary" value="registerEmp">Register</v-btn>
+                                 <v-btn @click="registraEmpresa" class="mt-4" dark color="secondary" value="registerEmp">Register</v-btn>
                               </form>
                            </v-card-text>
                         </v-card>
@@ -103,14 +103,60 @@
 <script>
 
 export default({
+    
+    data(){
+      return{
+         nombre: '',
+         apellidos: '',
+         correo: '',
+         error: ''
+      }
+   },
     name: 'Registro',
     methods:{
         registraUsuario(){
-            console.log("Se registro el usuario");
+
+            var password=generarPassword();
+            
+           if(this.nombre && this.apellidos && this.correo && password){
+               this.error=''; //Limpiamos el mensaje de error
+               const auth = getAuth();
+
+               createUserWithEmailAndPassword(auth, this.correo, password).then((userCredential) => {
+                  // Signed in
+                     const user = userCredential.user;
+
+                     console.log(user);
+                     console.log(password);
+               }).catch((error) => {
+                     const errorCode = error.code;
+                     const errorMessage = error.message;
+                     
+                     console.log(errorCode);
+                     console.log(errorMessage);
+                  });
+            }
+            else{
+               this.error='Faltan datos por añadir al formulario'
+            }
         },
          registraEmpresa(){
             console.log("Se registro la empresa");
         }
     }
 })
+
+ function generarPassword() {
+      const longitud = 10;
+      const caracteres = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+      var cadena = "";
+      var max = caracteres.length-1;
+      for (var i = 0; i<longitud; i++) {
+          cadena += caracteres[ Math.floor(Math.random() * (max+1)) ];
+      }
+
+      return cadena;
+   }
+
 </script>
