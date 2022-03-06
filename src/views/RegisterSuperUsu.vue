@@ -10,7 +10,7 @@
                         <v-card-text>
                            <form>
                               <v-text-field
-                                    v-model="username"
+                                    v-model="nombre"
                                     name="user"
                                     label="Nombre"
                                     type="text"
@@ -34,6 +34,18 @@
                                  placeholder="Correo electrónico"
                                  required
                               ></v-text-field>
+
+                              <v-radio-group v-model="rol" required>
+                                 <v-radio
+                                    label="TRABAJADOR"
+                                    value="Trabajador"
+                                 ></v-radio>
+
+                                  <v-radio
+                                    label="ADMINISTRADOR"
+                                    value="Admin"
+                                 ></v-radio>
+                                 </v-radio-group>
                            <v-btn  @click="registraUsuario" class="mt-4"  dark color="secondary" value="registerUsu">Register</v-btn>
                            </form>
                         </v-card-text>
@@ -45,7 +57,7 @@
                            <v-card-text>
                               <form>
                                  <v-text-field
-                                    v-model="nombre"
+                                    v-model="nombreEmp"
                                     name="nombEmp"
                                     label="Nombre"
                                     type="text"
@@ -102,6 +114,10 @@
 
 <script>
 
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {getFirestore, collection, addDoc} from "firebase/firestore"
+import firebaseApp from '../scripts/firebase';
+
 export default({
     
     data(){
@@ -109,6 +125,12 @@ export default({
          nombre: '',
          apellidos: '',
          correo: '',
+         rol:'',
+         nombreEmp: '',
+         direccion: '',
+         localidad: '',
+         cp: '',
+         dedicacion: '',
          error: ''
       }
    },
@@ -118,16 +140,29 @@ export default({
 
             var password=generarPassword();
             
-           if(this.nombre && this.apellidos && this.correo && password){
+            if(this.nombre && this.apellidos && this.correo && password){
                this.error=''; //Limpiamos el mensaje de error
                const auth = getAuth();
-
+               
                createUserWithEmailAndPassword(auth, this.correo, password).then((userCredential) => {
                   // Signed in
-                     const user = userCredential.user;
+                  const user = userCredential.user;
 
-                     console.log(user);
-                     console.log(password);
+                  console.log(user);
+                  console.log(password);
+ 
+                  //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
+                  const firebaseDB= getFirestore(firebaseApp);
+
+                     try {
+                        const docRef =  addDoc(collection(firebaseDB, "RolUser"), {
+                           ROL: this.rol,
+                           UID: user.uid
+                        });
+                        console.log("Document written with ID: ", docRef.id);
+                        } catch (e) {
+                        console.error("Error adding document: ", e);
+                        }
                }).catch((error) => {
                      const errorCode = error.code;
                      const errorMessage = error.message;
@@ -136,6 +171,7 @@ export default({
                      console.log(errorMessage);
                   });
             }
+
             else{
                this.error='Faltan datos por añadir al formulario'
             }
