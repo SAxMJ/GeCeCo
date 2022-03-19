@@ -14,6 +14,7 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
+
 // Your web app's Firebase configuration
 
 

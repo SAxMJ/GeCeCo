@@ -54,6 +54,7 @@
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import {getFirestore, collection, addDoc} from "firebase/firestore"
 import firebaseApp from '../scripts/firebase';
+import  {enviaMail} from 'C:/Users/seaxm/OneDrive/Desktop/GeCeCo/gececo/mails';
 
 export default({
    data(){
@@ -67,7 +68,7 @@ export default({
     name: 'Registro',
     methods:{
         registraUsuario(){
-           
+            
             var password=generarPassword();
             
             if(this.nombre && this.apellidos && this.correo && password){
@@ -83,13 +84,16 @@ export default({
  
                   //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
                   const firebaseDB= getFirestore(firebaseApp);
-
+                
                   try {
                      const docRef =  addDoc(collection(firebaseDB, "RolUser"), {
                         ROL: "Trabajador",
                         UID: user.uid
                      });
                      console.log("Document written with ID: ", docRef.id);
+
+                     //Se envia el correo electrónico de que la cuenta ha sido creada con la contraseña temporal
+                     enviaMail(1,this.correo,password);
                      } catch (e) {
                      console.error("Error adding document: ", e);
                      }
