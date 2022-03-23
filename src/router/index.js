@@ -37,6 +37,11 @@ const routes = [
     path: '/paginainicio',
     name: 'paginainicio',
     component: () => import('../views/PaginaInicio.vue')
+  },
+  {
+    path: '/cambiarpassword',
+    name: 'cambiarpassword',
+    component: () => import('../views/CambiarPassword.vue')
   }
   
 ];

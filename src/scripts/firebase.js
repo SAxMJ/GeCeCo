@@ -4,7 +4,6 @@ import  firebase  from 'firebase/compat/app';
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 
 
-
   const firebaseConfig = {
     apiKey: "AIzaSyAZWJA8GkibUqjbRRMfFQ_OhYhjOV3NAQs",
     authDomain: "gececo-c0865.firebaseapp.com",

@@ -54,7 +54,7 @@
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import {getFirestore, collection, addDoc} from "firebase/firestore"
 import firebaseApp from '../scripts/firebase';
-import  {enviaMail} from 'C:/Users/seaxm/OneDrive/Desktop/GeCeCo/gececo/mails';
+//import  {enviaMail} from '../../functions/mails';
 
 export default({
    data(){
@@ -74,7 +74,6 @@ export default({
             if(this.nombre && this.apellidos && this.correo && password){
                this.error=''; //Limpiamos el mensaje de error
                const auth = getAuth();
-               
                createUserWithEmailAndPassword(auth, this.correo, password).then((userCredential) => {
                   // Signed in
                   const user = userCredential.user;
@@ -92,8 +91,8 @@ export default({
                      });
                      console.log("Document written with ID: ", docRef.id);
 
-                     //Se envia el correo electrónico de que la cuenta ha sido creada con la contraseña temporal
-                     enviaMail(1,this.correo,password);
+                     //SE ENVIA EL CORREO ELECTRÓNICO QUE SE HARÁ CON LAS FUNCTIONS DE FIREBASE
+                     //enviaMail(1,this.correo,password);
                      } catch (e) {
                      console.error("Error adding document: ", e);
                      }
