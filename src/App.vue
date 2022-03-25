@@ -2,11 +2,9 @@
   <v-app>
     <div id="app">
       <v-layout>
-         <v-app-bar color="secondary">
                     <router-link to="/">
                       <v-img max-height="50" max-width="50" src='./images/Gececo.jpg'></v-img>
                     </router-link>
-        </v-app-bar>
       </v-layout>
       <router-view/>
     </div>
@@ -23,7 +21,6 @@
 }
 
 nav {
-  padding: 30px;
 
   a {
     font-weight: bold;

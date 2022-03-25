@@ -36,13 +36,24 @@ const routes = [
   {
     path: '/paginainicio',
     name: 'paginainicio',
-    component: () => import('../views/PaginaInicio.vue')
+    component: () => import('../views/trabajador/PaginaInicio.vue')
   },
   {
     path: '/cambiarpassword',
     name: 'cambiarpassword',
     component: () => import('../views/CambiarPassword.vue')
+  },
+  {
+    path: '/ticketsusuario',
+    name: 'ticketsusuario',
+    component: () => import('../views/trabajador/TicketsUsuario.vue')
+  },
+  {
+    path: '/miusuario',
+    name: 'miusuario',
+    component: () => import('../views/trabajador/MiUsuario.vue')
   }
+
   
 ];
 

@@ -44,8 +44,9 @@
 
 
 <script>
+import  firebase  from 'firebase/compat/app';
 import firebaseApp from '../scripts/firebase';
-import {getAuth, EmailAuthProvider, reauthenticateWithCredential} from "firebase/auth";
+import {getAuth, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail} from "firebase/auth";
 export default({
    data(){
       return{
@@ -62,7 +63,13 @@ export default({
                 this.error='';
                 const auth=getAuth();
                 const user = auth.currentUser;
-                
+
+               try{ //Se envía un mensaje de resauración de la contraseña al email
+                  sendPasswordResetEmail(auth,user.email);
+               }catch(e){
+                  console.log("EL ERROR: "+e)
+               }
+               /*
                 //ANTES DE CAMBIAR LA CONTRASEÑA HABRÍA QUE HACER UNA COMPROBACION DE SI LA ANTERIOR CONTRASEÑA ES UNA CONTRASEÑA VÁLIDA O NO
                 const credential = EmailAuthProvider.credential(user.email, this.passwordAnt);
                 
@@ -74,11 +81,12 @@ export default({
                 });
                 }).catch(function(error) {
                    console.log("La contraseña anterior es incorrecta"); //ESTO HABRÍA QUE PONERLO POR HTML
-                });
+                });*/
             }
              else{
                this.error='Introduce las contraseñas'
             }
+            
         }
     }
 })

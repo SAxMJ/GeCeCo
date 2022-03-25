@@ -16,9 +16,10 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
     // Initialize Firebase
   const firebaseApp = firebase.initializeApp(firebaseConfig);
   const firestoreDB = getFirestore(firebaseApp);
-  
+  //firebase.functions().useEmulator("localhost" ,5000);
+  //firebase.functions().useFunctionsEmulator('http://localhost:5001/');
+  //firebase.functions().useFunctionsEmulator('http://localhost:5001/');
   export default firebaseApp;
-  //export default firebaseApp.firestore();
     
     //Nos conectamos a la colección de usuarios
   const coleccion = collection(firestoreDB,'users');
