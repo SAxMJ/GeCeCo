@@ -1,16 +1,12 @@
 <template>
 <div>
-     <h1> Esto es inicio {{rol}} </h1>
-    <BarraLateral v-if = "rol==1"></BarraLateral>
-    <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
+     <h1> Esto es empresas </h1>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
   </div>
 </template>
 
 <script>
   
-  import BarraLateral from '../../components/BarraLateralNormal.vue'
-  import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
 
   var rolUsr=1;
@@ -23,8 +19,6 @@
       }
       },
     components:{
-      BarraLateral,
-      BarraLateralAdmin,
       BarraLateralSuperUsu
     }
   }

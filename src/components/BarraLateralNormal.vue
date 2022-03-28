@@ -40,9 +40,9 @@
       return {
         drawer: true,
         items: [
-          { title: 'Inicio', icon: 'mdi-home', path: '/paginainicio',},
-          { title: 'Tickets', icon: 'mdi-ticket', path: '/ticketsusuario'},
-          { title: 'Usuario', icon: 'mdi-account', path: '/miusuario' },
+          { title: 'Inicio', icon: 'mdi-home', path: '/paginainicio/1',},
+          { title: 'Tickets', icon: 'mdi-ticket', path: '/ticketsusuario/1'},
+          { title: 'Usuario', icon: 'mdi-account', path: '/miusuario/1' },
         ],
         mini: true,
       }

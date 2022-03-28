@@ -17,7 +17,7 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
   const firebaseApp = firebase.initializeApp(firebaseConfig);
   const firestoreDB = getFirestore(firebaseApp);
   //firebase.functions().useEmulator("localhost" ,5000);
-  //firebase.functions().useFunctionsEmulator('http://localhost:5001/');
+  firebase.functions().useFunctionsEmulator('http://localhost:5001/');
   //firebase.functions().useFunctionsEmulator('http://localhost:5001/');
   export default firebaseApp;
     

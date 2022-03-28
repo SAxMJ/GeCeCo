@@ -105,17 +105,31 @@
       </v-container>
     </v-card>
     <v-btn class="blue" dark>Nuevo</v-btn>
-    <BarraLateral></BarraLateral>
+    <BarraLateral v-if = "rol==1"></BarraLateral>
+    <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
+    <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
   </v-container>
 </template>
 
 <script>
   
-  import BarraLateral from '../../components/BarraLateral.vue'
+  import BarraLateral from '../../components/BarraLateralNormal.vue'
+  import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
+  import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
+
+  var rolUsr=1;
+  console.log("Es--> " +rolUsr);
   
   export default{
+    data (){
+      return{
+        rol: this.$route.params.rol
+      }
+      },
     components:{
-      BarraLateral
+      BarraLateral,
+      BarraLateralAdmin,
+      BarraLateralSuperUsu
     }
   }
 </script>

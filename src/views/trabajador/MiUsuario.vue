@@ -10,8 +10,7 @@
         cols="12"
         md="8"
       >
-        <material-card
-          color="primary"
+        <v-card
           icon="mdi-account-outline"
         >
           <template #title>
@@ -131,14 +130,14 @@
               </v-row>
             </v-container>
           </v-form>
-        </material-card>
+        </v-card>
       </v-col>
 
       <v-col
         cols="12"
         md="4"
       >
-        <app-card class="mt-4 text-center">
+        <v-card class="mt-4 text-center">
           <v-img
             class="rounded-circle elevation-6 mt-n12 d-inline-block"
             src="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
@@ -167,21 +166,36 @@
               Follow
             </v-btn>
           </v-card-text>
-        </app-card>
+        </v-card>
       </v-col>
     </v-row>
-     <BarraLateral></BarraLateral>
+    <BarraLateral v-if = "rol==1"></BarraLateral>
+    <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
+    <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
     </v-container>
   </v-container>
 </template>
 
 <script>
   
-  import BarraLateral from '../../components/BarraLateral.vue'
+  import BarraLateral from '../../components/BarraLateralNormal.vue'
+  import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
+  import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
+
+  var rolUsr=1;
+  console.log("Es--> " +rolUsr);
   
   export default{
+    data (){
+      return{
+        rol: this.$route.params.rol
+      }
+      },
     components:{
-      BarraLateral
+      BarraLateral,
+      BarraLateralAdmin,
+      BarraLateralSuperUsu
     }
   }
+
 </script>

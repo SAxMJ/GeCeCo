@@ -11,6 +11,7 @@
   </v-app>
 </template>
 
+
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -32,3 +33,4 @@ nav {
   }
 }
 </style>
+

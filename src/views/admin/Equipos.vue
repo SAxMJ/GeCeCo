@@ -1,7 +1,6 @@
 <template>
 <div>
-     <h1> Esto es inicio {{rol}} </h1>
-    <BarraLateral v-if = "rol==1"></BarraLateral>
+     <h1> Esto es equipos {{rol}} </h1>
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
   </div>
@@ -9,7 +8,6 @@
 
 <script>
   
-  import BarraLateral from '../../components/BarraLateralNormal.vue'
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
 
@@ -23,7 +21,6 @@
       }
       },
     components:{
-      BarraLateral,
       BarraLateralAdmin,
       BarraLateralSuperUsu
     }
