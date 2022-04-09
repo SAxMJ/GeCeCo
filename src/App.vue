@@ -1,10 +1,10 @@
 <template>
   <v-app>
-    <div id="app">
+    <div id="app" class="blue-grey lighten-4">
       <v-layout>
-                    <router-link to="/">
-                      <v-img max-height="50" max-width="50" src='./images/Gececo.jpg'></v-img>
-                    </router-link>
+        <router-link to="/">
+          <v-img max-height="50" max-width="50" src='./images/Gececo.jpg'></v-img>
+        </router-link>
       </v-layout>
       <router-view/>
     </div>

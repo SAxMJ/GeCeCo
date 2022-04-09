@@ -1,5 +1,6 @@
 
-const  firebase= require ('firebase/compat/app');
+
+
   const firebaseConfig = {
     apiKey: "AIzaSyAZWJA8GkibUqjbRRMfFQ_OhYhjOV3NAQs",
     authDomain: "gececo-c0865.firebaseapp.com",
@@ -9,4 +10,6 @@ const  firebase= require ('firebase/compat/app');
     appId: "1:850837378930:web:8c6aa4e4bd92284a9d2feb"
   };
   // Initialize Firebase
-  const firebaseApp = firebase.initializeApp(firebaseConfig);
+  //const firebaseApp = initializeApp(firebaseConfig);
+
+  //export default firebaseApp;

@@ -24,6 +24,11 @@ const routes = [
     component: () => import( '../views/Login.vue')
   },
   {
+    path: '/passwordolvidada',
+    name: 'passwordolvidada',
+    component: () => import( '../views/PasswordOlvidada.vue')
+  },
+  {
     path: '/registersuperusu/:rol',
     name: 'registersuperusu',
     component: () => import( '../views/RegisterSuperUsu.vue')
@@ -100,6 +105,8 @@ router.beforeEach((to,from,next)=>{
         next();
       }else if(to.path=='/login'){
         next();
+      }else if(to.path=='/passwordolvidada'){
+        next();
       }
       else{
         next('/null');
@@ -112,39 +119,29 @@ function getRol(to,next,user){
           //vuewait.start("Esperando");
           const firebaseDB= getFirestore(firebaseApp);  
           //Recordar que la , en mongo era como un and
-          const consulta =  query(collection(firebaseDB, "RolUser"), where("UID", "==", user.uid), where("ROL", "==", "Admin"));
+          const consulta =  query(collection(firebaseDB, "RolUser"), where("Correo", "==", user.email), where("ROL", "==", "Admin"));
           onSnapshot(consulta, (querySnapshot) => {
             //Si se ha recuperado al menos un resultado quiere decir que el usuario con dicho UID es admin
             if(querySnapshot.size!==0){
-              console.log("SoyAdmin");
               rol=2;
               ejecutaRuta(rol,to,next);
-              console.log("rol es "+rol);
-            }else{
-              console.log("No soy admin")
             }
           });
 
-          const consulta2 =  query(collection(firebaseDB, "RolUser"), where("UID", "==", user.uid), where("ROL", "==", "SuperUsu"));
+          const consulta2 =  query(collection(firebaseDB, "RolUser"), where("Correo", "==", user.email), where("ROL", "==", "SuperUsu"));
           onSnapshot(consulta2, (querySnapshot) => {
           //Si se ha recuperado al menos un resultado quiere decir que el usuario con dicho UID es admin
           if(querySnapshot.size!==0){
-            console.log("SuperUsu");
             rol=3;
             ejecutaRuta(rol,to,next);
-          }else{
-            console.log("No soy SuperUsu");
           }
         });
 
-          const consulta3 =  query(collection(firebaseDB, "RolUser"), where("UID", "==", user.uid), where("ROL", "==", "Trabajador"));
+          const consulta3 =  query(collection(firebaseDB, "RolUser"), where("Correo", "==", user.email), where("ROL", "==", "Trabajador"));
           onSnapshot(consulta3, (querySnapshot) => {
           //Si se ha recuperado al menos un resultado quiere decir que el usuario con dicho UID es admin
           if(querySnapshot.size!==0){
-            console.log("Trabajador");
             ejecutaRuta(rol,to,next);
-          }else{
-            console.log("No soy Trabajador")
           }
         });
 
@@ -156,19 +153,15 @@ function ejecutaRuta(rol,to,next){
     //Cualquier rol puede acceder a estas URL
     if(rol==1){
       if(to.path==='/login'){
-        console.log(to.path);
         next('paginainicio/'+rol)
       }
       else if(to.path==='/paginainicio/1' && to.path!=='paginainicio/2' && to.path!=='paginainicio/3'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/ticketsusuario/1' && to.path!=='ticketsusuario/2' && to.path!=='ticketsusuario/3'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/miusuario/1' && to.path!=='miusuario/2' && to.path!=='miusuario/3'){ 
-        console.log(to.path);
         next()
       }else if(to.path==='/'){
         next();
@@ -180,45 +173,43 @@ function ejecutaRuta(rol,to,next){
       }
     }
 
-
     //Admin y superusuario pueden acceder a estas URL
     if(rol==2){
       console.log("EL ROL ES");
 
       if(to.path==='/login'){
-        console.log(to.path);
         next('paginainicio/'+rol)
       }
       else if(to.path==='/paginainicio/2' && to.path!=='paginainicio/1' && to.path!=='paginainicio/3'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/ticketsusuario/2' && to.path!=='ticketsusuario/1' && to.path!=='ticketsusuario/3'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/miusuario/2' && to.path!=='miusuario/1' && to.path!=='miusuario/3'){ 
-        console.log(to.path);
         next()
       }
       else if(to.path==='/equipos/2'  && to.path!=='equipos/1' && to.path!=='equipos/3'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/alertas/2' && to.path!=='alertas/1' && to.path!=='alertas/3'){ //Controlaremos que solo si es un admin pueda acceder
-        console.log(to.path);
         next()
       }
       else if(to.path==='/usuarios/2'  && to.path!=='usuarios/1' && to.path!=='usuarios/3'){ //Controlaremos que solo si es un admin pueda acceder
-        console.log(to.path);
         next()
       }
       else if(to.path==='/ticketsadmin/2'  && to.path!=='ticketsadmin/1' && to.path!=='ticketsadmin/3'){ //Controlaremos que solo si es un admin pueda acceder
-        console.log(to.path+"hahaha");
+        next()
+      }
+      else if(to.path==='/registeradmin/2'  && to.path!=='registeradmin/1' && to.path!=='registeradmin/3'){ //Controlaremos que solo si es un admin pueda acceder
         next()
       }
       else if(to.path==='/'){
           next();
+      }
+      else if(to.path==='/cambiarpassword/2'  && to.path!=='cambiarpassword/3' && to.path!=='cambiarpassword/1'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
       }
       else{
         console.log(to.path);
@@ -232,34 +223,31 @@ function ejecutaRuta(rol,to,next){
         next('paginainicio/'+rol)
       }
       else if(to.path==='/paginainicio/3' && to.path!=='paginainicio/1' && to.path!=='paginainicio/2'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/ticketsusuario/3' && to.path!=='ticketsusuario/1' && to.path!=='ticketsusuario/2'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/miusuario/3' && to.path!=='miusuario/1' && to.path!=='miusuario/2'){ 
-        console.log(to.path);
         next()
       }
       else if(to.path==='/equipos/3'  && to.path!=='equipos/1' && to.path!=='equipos/2'){
-        console.log(to.path);
         next()
       }
       else if(to.path==='/alertas/3' && to.path!=='alertas/1' && to.path!=='alertas/2'){ //Controlaremos que solo si es un admin pueda acceder
-        console.log(to.path);
         next()
       }
       else if(to.path==='/usuarios/3'  && to.path!=='usuarios/1' && to.path!=='usuarios/2'){ //Controlaremos que solo si es un admin pueda acceder
-        console.log(to.path);
         next()
       }
       else if(to.path==='/ticketsadmin/3'  && to.path!=='ticketsadmin/1' && to.path!=='ticketsadmin/2'){ //Controlaremos que solo si es un admin pueda acceder
-        console.log(to.path+"hahaha");
         next()
       }
       else if(to.path==='/empresas/3'  && to.path!=='empresas/1' && to.path!=='empresas/2'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
+      }
+      else if(to.path==='/cambiarpassword/3'  && to.path!=='cambiarpassword/1' && to.path!=='cambiarpassword/2'){ //Controlaremos que solo si es un admin pueda acceder
         console.log(to.path);
         next()
       }

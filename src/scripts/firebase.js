@@ -12,12 +12,14 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
     messagingSenderId: "850837378930",
     appId: "1:850837378930:web:8c6aa4e4bd92284a9d2feb"
   };
-    
     // Initialize Firebase
   const firebaseApp = firebase.initializeApp(firebaseConfig);
   const firestoreDB = getFirestore(firebaseApp);
+  
+  //const functions = getFunctions(getApp());
+  //connectFunctionsEmulator(functions, "localhost", 5001);
   //firebase.functions().useEmulator("localhost" ,5000);
-  firebase.functions().useFunctionsEmulator('http://localhost:5001/');
+  //firebase.functions().useFunctionsEmulator('http://localhost:5001/');
   //firebase.functions().useFunctionsEmulator('http://localhost:5001/');
   export default firebaseApp;
     

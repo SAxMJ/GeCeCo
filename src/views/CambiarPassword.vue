@@ -58,30 +58,33 @@ export default({
     name: 'cambiarPassword',
     methods:{
          cambiarPassword(){
+
             if(this.passwordAnt && this.passwordNue){
-               
-                this.error='';
-                const auth=getAuth();
-                const user = auth.currentUser;
+               /*
+                
 
                try{ //Se envía un mensaje de resauración de la contraseña al email
                   sendPasswordResetEmail(auth,user.email);
                }catch(e){
                   console.log("EL ERROR: "+e)
                }
-               /*
+               */
+               
+                this.error='';
+                const auth=getAuth();
+                const user = auth.currentUser;
                 //ANTES DE CAMBIAR LA CONTRASEÑA HABRÍA QUE HACER UNA COMPROBACION DE SI LA ANTERIOR CONTRASEÑA ES UNA CONTRASEÑA VÁLIDA O NO
                 const credential = EmailAuthProvider.credential(user.email, this.passwordAnt);
                 
-                reauthenticateWithCredential(user,credential).then(result=>{
+                //reauthenticateWithCredential(user,credential).then(result=>{
                     console.log("PassCambiada");
                     const cambiarPassword=firebaseApp.functions().httpsCallable('cambiarPassword');
                     cambiarPassword({usuario: user.uid, pass: passwordNue}).then(result=> {
-                    
+                    console.log(result.data());
+                //});
+                //}).catch(function(error) {
+                   //console.log("La contraseña anterior es incorrecta"); //ESTO HABRÍA QUE PONERLO POR HTML
                 });
-                }).catch(function(error) {
-                   console.log("La contraseña anterior es incorrecta"); //ESTO HABRÍA QUE PONERLO POR HTML
-                });*/
             }
              else{
                this.error='Introduce las contraseñas'

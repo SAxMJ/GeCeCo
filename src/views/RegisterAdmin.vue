@@ -51,14 +51,23 @@
 
 <script>
 
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail} from "firebase/auth";
 import {getFirestore, collection, addDoc} from "firebase/firestore"
 import firebaseApp from '../scripts/firebase';
 //import  {enviaMail} from '../../functions/mails';
+import {query, where, getDocs, onSnapshot  } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
+import { getApp } from "firebase/app";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
+
+
+const functions = getFunctions(getApp());
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default({
    data(){
       return{
+         rol: this.$route.params.rol,
          nombre: '',
          apellidos: '',
          correo: '',
@@ -70,47 +79,51 @@ export default({
         registraUsuario(){
             
             var password=generarPassword();
-            
+
+            const firebaseDB= getFirestore(firebaseApp);
+            //functions=getFunctions();
+
             if(this.nombre && this.apellidos && this.correo && password){
                this.error=''; //Limpiamos el mensaje de error
-               const auth = getAuth();
-               createUserWithEmailAndPassword(auth, this.correo, password).then((userCredential) => {
-                  // Signed in
-                  const user = userCredential.user;
 
-                  console.log(user);
-                  console.log(password);
- 
-                  //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
-                  const firebaseDB= getFirestore(firebaseApp);
-                
-                  try {
-                     const docRef =  addDoc(collection(firebaseDB, "RolUser"), {
-                        ROL: "Trabajador",
-                        UID: user.uid
-                     });
-                     console.log("Document written with ID: ", docRef.id);
-
-                     //SE ENVIA EL CORREO ELECTRÓNICO QUE SE HARÁ CON LAS FUNCTIONS DE FIREBASE
-                     //enviaMail(1,this.correo,password);
-                     } catch (e) {
-                     console.error("Error adding document: ", e);
-                     }
-
-               }).catch((error) => {
-                     const errorCode = error.code;
-                     const errorMessage = error.message;
-                     
-                     console.log(errorCode);
-                     console.log(errorMessage);
-                  });
+               const registrarTrabajador=httpsCallable(functions,"registrarTrabajador");
+               registrarTrabajador({usuario: this.correo, pass: password}).then(async(resultado)=> {
+         
+                  //const mailEstablecerPassword=httpsCallable(functions,"mailEstablecerPassword");
+                  //mailEstablecerPassword({usuario: this.correo}).then(result=> {
+                     //const data=result.data;
+                     console.log("ELUIDDDD es "+resultado.data);
+                     await sendPasswordResetEmail(getAuth(),this.correo);
+                     //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
+                      try {
+                        const docRef =  await addDoc(collection(firebaseDB, "RolUser"), {
+                           ROL: "Trabajador",
+                           UID: resultado.data,
+                           Correo:this.correo
+                        });
+                        //console.log("Document written with ID: ", docRef.id);
+                        } catch (e) {
+                        //console.error("Error adding document: ", e);
+                        }
+                  //});
+               });
             }
             else{
                this.error='Faltan datos por añadir al formulario'
             }
+
+            //Ahora lo que haremos será obtener el ID de la empresa correspondiente al administrador para asginarselo al nuevo registrado
+            //ya que un administrador solo puede registrar trabajadores para su empresa.
+            const auth = getAuth();
+            const consulta =  query(collection(firebaseDB, "Trabajadores"), where("UID", "==", auth.currentUser.uid));
+
+            IdEmpresaAdminYAddTrabajador(firebaseDB,consulta,this.nombre,this.apellidos,this.correo);
         }
     }
 })
+
+//FUNCIONES
+
     //Función encargada de generar una contraseña de 10 caracteres aleatorios
    function generarPassword() {
       const longitud = 10;
@@ -123,6 +136,29 @@ export default({
       }
 
       return cadena;
+   }
+
+   //Función que obtiene el Id empresa del admin y registra al trabajador en la base de datos
+   async function IdEmpresaAdminYAddTrabajador(firebaseDB,consulta,nombre,apellidos,correo){
+
+      const querySnapshot = await getDocs(consulta);
+      
+      querySnapshot.forEach((doc) => {
+         //Ahora una vez que tenemos el documento del administrador, le crearemos un documento para el nuevo trabajador
+         //con el id de la empresa del administrador
+         try {
+            const docRef =  addDoc(collection(firebaseDB, "Trabajadores"), {
+               Nombre: nombre,
+               Apellidos: apellidos,
+               Correo: correo,
+               IdEmpresa: doc.get("IdEmpresa"),
+               ROL: "Trabajador"
+            });
+            //console.log("Document written with ID: ", docRef.id);
+            } catch (e) {
+            //console.error("Error adding document: ", e);
+            }
+      });
    }
 
 </script>

@@ -37,6 +37,9 @@
                      </v-tab-item>
                </v-tabs>
             </v-card>
+            <router-link to="/passwordolvidada">
+            <v-text>He olvidado mi contraseña</v-text>
+            </router-link>
          </v-flex>
       </v-layout>
    </v-container>
