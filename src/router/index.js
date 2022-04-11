@@ -29,14 +29,9 @@ const routes = [
     component: () => import( '../views/PasswordOlvidada.vue')
   },
   {
-    path: '/registersuperusu/:rol',
-    name: 'registersuperusu',
-    component: () => import( '../views/RegisterSuperUsu.vue')
-  },
-  {
     path: '/registeradmin/:rol',
     name: 'registeradmin',
-    component: () => import( '../views/RegisterAdmin.vue')
+    component: () => import( '../views/admin/RegisterAdmin.vue')
   },
   {
     path: '/paginainicio/:rol',
@@ -82,6 +77,21 @@ const routes = [
     path: '/empresas/:rol',
     name: 'empresas',
     component: () => import('../views/superusuario/Empresas.vue')
+  },
+  {
+    path: '/registersuperusu/:rol',
+    name: 'registersuperusu',
+    component: () => import('../views/superusuario/RegisterSuperUsu.vue')
+  },
+  {
+    path: '/registerempresa/:rol',
+    name: 'registerempresa',
+    component: () => import('../views/superusuario/RegisterEmpresa.vue')
+  },
+  {
+    path: '/usuariosempresa/:rol',
+    name: 'usuariosempresa',
+    component: () => import('../views/superusuario/UsuariosEmpresa.vue')
   }
 
   
@@ -248,6 +258,14 @@ function ejecutaRuta(rol,to,next){
         next()
       }
       else if(to.path==='/cambiarpassword/3'  && to.path!=='cambiarpassword/1' && to.path!=='cambiarpassword/2'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
+      }
+      else if(to.path==='/registersuperusu/3'  && to.path!=='registersuperusu/1' && to.path!=='registersuperusu/2'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
+      }
+      else if(to.path==='/registerempresa/3'  && to.path!=='registerempresa/1' && to.path!=='registerempresa/2'){ //Controlaremos que solo si es un admin pueda acceder
         console.log(to.path);
         next()
       }
