@@ -60,6 +60,26 @@ exports.mailEstablecerPassword=functions.https.onCall(async (data,context)=>{
   return ""+eluid;
 });
 
+exports.modificaCorreoUsuario=functions.https.onCall(async(data,context)=>{
+  
+  var newCorreo;
+  await admin.auth().getUserByEmail(data.correo1).then(async(userRecord)=>{
+    console.log("Se recogió correctemente el usuario");
+    
+     await admin.auth().updateUser(userRecord.uid,{
+       email: data.correo2
+     }).then((userRecord)=>{
+       console.log("Se modificó el email del usuario correctamente: "+userRecord.email);
+       newCorreo=userRecord.email;
+     }).catch((error)=>{
+       console.log("Error mientras se actualizaba el email del usuario: "+error);
+     })
+  }).catch((error)=>{
+      console.log("ERROR al tratar de obtener el usuario: "+error);
+  });
+  return newCorreo;
+})
+
 
 
 

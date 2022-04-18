@@ -100,6 +100,23 @@
           </v-tabs>
       </template>
       </v-dialog>
+
+       <!--DIÁLOGO DE CONFIRMACIÓN DE BAJA DE USUARIO-->
+      <v-dialog width="500" v-model="flagbajaempresa">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-text>¿Estás seguro?</v-text>
+              </v-card-title>
+              <v-card-text>
+                <v-text>Se dará de baja la empresa</v-text>
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="reseteaFlags">CANCELAR</v-btn>
+              <v-btn color="green darken-1" text @click="darDeBajaEmpresa">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog>
+
     </v-card>
     </div>
 
@@ -205,6 +222,10 @@
         </v-card>
       </v-col>
       </v-row>
+      <div class="py-3" />
+      <v-container>
+      <v-btn class="primary" @click="volverAEmpresas">Volver</v-btn> 
+      </v-container>
       </v-container>
 
       <!--DIÁLOGO DE CONFIRMACIÓN DE RESTABLECIMIENTO DE CONTRASEÑA-->
@@ -223,7 +244,7 @@
       </template>
       </v-dialog>
 
-      <!--DIÁLOGO DE MODIFICAR EL USUARIO-->
+<!--DIÁLOGO DE MODIFICAR EL USUARIO-->
       <v-dialog width="500" v-model="flagmodificauser">
       <template>
           <v-card>
@@ -231,7 +252,7 @@
                 <v-text>¿Estás seguro?</v-text>
               </v-card-title>
               <v-card-text>
-                <v-text>Se enviará un correo al usuario de restablecimiento de su contraseña</v-text>
+                <v-text>Se grabarán los cambios realizados al usuario</v-text>
               </v-card-text>
               <v-btn color="red darken-1" text @click="reseteaFlags">CANCELAR</v-btn>
               <v-btn color="green darken-1" text @click="modificarUsuario">ACEPTAR</v-btn>
@@ -254,6 +275,51 @@
           </v-card>
       </template>
       </v-dialog>
+
+
+      <v-dialog width="700" v-model="flagmodificandousuario">
+      <v-card height="50" >MODIFICAR USUARIO</v-card>
+      <v-card>
+          <v-form>
+            <v-container class="py-0">
+              <v-row align-content-center>
+                <v-col cols="12" md="4" >
+                  <v-text-field color="black" label="Nombre" v-model= "nombreModifica" :readonly=false required/>
+                </v-col> 
+
+                <v-col cols="12" md="4">
+                  <v-text-field color="black" label="Apellidos" v-model= "apellidosModifica" :readonly=false required/>
+                </v-col>
+
+                <v-col align-content-space- cols="12" md="4">
+                  <v-img align-center max-height="100" max-width="100" :src="imgurl"></v-img>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                  <v-text-field color="black" label="Email" v-model= "emailModifica" :readonly=false required />
+                </v-col>
+
+                <v-col cols="12" md="6">
+                  <v-text-field color="black" label="Empresa" v-model= "empresaModifica" readonly required/>
+                </v-col>
+
+                <v-radio-group v-model="roles">
+                  <v-radio label="Admin" value="Admin">
+                  </v-radio>
+                  <v-radio label="Trabajador" value="Trabajador">
+                  </v-radio>
+              </v-radio-group>
+
+                <v-col cols="12" class="text-right">
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+       </v-card>
+       <v-card>
+        <v-btn color="green darken-1" text @click="flagmodificauser=true">Guardar cambios</v-btn> 
+       </v-card>
+    </v-dialog> 
 
 
       
@@ -356,6 +422,7 @@ connectFunctionsEmulator(functions, "localhost", 5001);
         localidad: "",
         nombre: "",
         imgurl: "",
+    
         
         //Flas de control de los mensajes
         flagmodificapass:false,
@@ -364,7 +431,9 @@ connectFunctionsEmulator(functions, "localhost", 5001);
         flagmodificauser:false,
         flagbajausuario: false,
         flagexito:false,
-
+        flagbajaempresa:false,
+        
+        
         //Variables de registro de usuarios
         apellidotrabajador: "",
         correotrabajador: "",
@@ -390,12 +459,19 @@ connectFunctionsEmulator(functions, "localhost", 5001);
         rolUserUsuario: "",
         empresaUsuario: "",
         imgurlUsuario: "",
+        
+        roles: "",
+        nombreModifica: "",
+        apellidosModifica: "",
+        emailModifica: "",
+        empresaModifica: "",
          opcionesUsuarios:[
           {title: 'Restablecer contraseña'},
           {title: 'Modificar'},
           {title: 'Dar de baja'},
         ],
         usuarioSeleccionado:false,
+        flagmodificandousuario:false,
       }
       },
     components:{
@@ -465,13 +541,11 @@ connectFunctionsEmulator(functions, "localhost", 5001);
           console.log("Queremos restablecer la contraseña")
         }else if(index==1){
           console.log("Queremos consultar los trabajadores de la empresa")
-          this.flagMostrarTrabajadores=true;
           this.recuperaUsuariosPorIdEmpresa();
         }
         else if(index==2){
           console.log("Queremos dar de baja el usuario")
-          this.flagbajausuario=true;
-          this.flagmodificapasshecho=true;
+          this.flagbajaempresa=true;
         }
       },
 
@@ -529,6 +603,41 @@ connectFunctionsEmulator(functions, "localhost", 5001);
               this.error='Faltan datos por añadir al formulario'
             }
       },
+      //Eliminaremos los registros de la empresa en la base de datos , tamben deberemos eliminar cada usuario del sistema, para ello buscaremos
+      //todos los usuarios con el id empresa, recuperaremos su email y los borraremos del sistema para despues eliminarlos de la base de datos
+      async darDeBajaEmpresa(){
+        const firebaseDB= getFirestore(firebaseApp);
+        const darDeBajaUsuario=httpsCallable(functions,"darDeBajaUsuario");
+          
+          
+          //Después de dar de baja el usuario eliminamos todas sus referencias de la base de datos
+            const consulta=query(collection(firebaseDB,"Trabajadores"),where("IdEmpresa", "==", this.idempresa));
+            const querySnapshot = await getDocs(consulta);
+      
+            //Por cada documento que encontremos eliminaremos al usuario y borraremos de la DB
+            querySnapshot.forEach(async(doc) => {
+              darDeBajaUsuario({correo: doc.get("Correo")}).then(async(result) => {
+                
+                var consulta2=query(collection(firebaseDB, "RolUser"),where("Correo", "==",doc.get("Correo")))
+                const querySnapshot2 = await getDocs(consulta2);
+                querySnapshot2.forEach(async(doc2) => {
+                  await deleteDoc(doc2.ref);
+                });
+                console.log("Usuario borrado: "+result.data);
+              });
+
+              await deleteDoc(doc.ref);
+            });
+          
+            var consulta3=query(collection(firebaseDB, "Empresas"),where("IdEmpresa", "==",this.idempresa))
+            const querySnapshot3 = await getDocs(consulta3);
+            querySnapshot3.forEach(async(doc3) => {
+              await deleteDoc(doc3.ref);
+            });
+
+            this.flagbajaempresa=false;
+            this.flagexito=true;
+      },
 
 
 
@@ -538,11 +647,19 @@ connectFunctionsEmulator(functions, "localhost", 5001);
         this.flagmodificauser=false;
         this.flagbajausuario=false;
         this.flagexito=false;
+        this.flagbajaempresa=false;
       },
 
 
       //A PARTIR DE AQUÍ SE ENCUENTRAN LOS MÉTODOS ENCARGADOS DE LA GESTIÓN DE USUARIOS DE CADA EMPRESA
       async recuperaUsuariosPorIdEmpresa(){
+        this.usuarios=[];
+        this.nombreUsuario="";
+        this.apellidosUsuario="";
+        this.emailUsuario="";
+        this.empresaUsuario="";
+        this.rolUserUsuario="";
+        console.log("El nombre"+this.nombreModifica);
         const firebaseDB= getFirestore(firebaseApp);
         const consulta =  query(collection(firebaseDB, "Trabajadores"), where("IdEmpresa", "==", this.seleccionados[0].IdEmpresa));
         const querySnapshot = await getDocs(consulta);
@@ -550,6 +667,7 @@ connectFunctionsEmulator(functions, "localhost", 5001);
         querySnapshot.forEach((doc) => {
           this.usuarios.push(doc.data());
         });
+        this.flagMostrarTrabajadores=true;
       },
 
       itemSeleccionadoUsuarios(index){
@@ -558,7 +676,12 @@ connectFunctionsEmulator(functions, "localhost", 5001);
           console.log("Queremos restablecer la contraseña")
         }else if(index==1){
           console.log("Queremos modificar el usuario")
-          this.flagmodificauser=true;
+          this.flagmodificandousuario=true;
+          this.roles=this.rolUserUsuario;
+          this.nombreModifica=this.nombreUsuario;
+          this.apellidosModifica=this.apellidosUsuario;
+          this.emailModifica=this.emailUsuario;
+          this.empresaModifica=this.empresaUsuario;
         }
         else if(index==2){
           console.log("Queremos dar de baja el usuario")
@@ -568,15 +691,16 @@ connectFunctionsEmulator(functions, "localhost", 5001);
 
       compruebaUsuarios(){
         console.log("Entro comprueba");
-        
-        if(this.usuariosSeleccionados[0]){
-          //console.log("Tiene algo");
-          this.usuarioSeleccionado=true;
-          this.GetDatosUsuario();
-        }
-        else{
-          //console.log("Esta vacio");
-          this.usuarioSeleccionado=false;
+        if(!this.flagmodificandousuario){
+          if(this.usuariosSeleccionados[0]){
+            //console.log("Tiene algo");
+            this.usuarioSeleccionado=true;
+            this.GetDatosUsuario();
+          }
+          else{
+            //console.log("Esta vacio");
+            this.usuarioSeleccionado=false;
+          }
         }
       },
 
@@ -622,7 +746,49 @@ connectFunctionsEmulator(functions, "localhost", 5001);
       },
 
       async modificarUsuario(){
+        const firebaseDB= getFirestore(firebaseApp);
+       //COMPROBAMOS AQUI LAS variableModifica JUNTO CON LAS VARIABLES NORMALES PARA HACER SOLO LAS MODIFICACIONES NECESARIAS
+        if(this.emailUsuario!=this.emailModifica){
+        
+          const darDeBajaUsuario=httpsCallable(functions,"modificaCorreoUsuario");
+          darDeBajaUsuario({correo1: this.emailUsuario, correo2: this.emailModifica}).then(async(result) => {
+            
+          console.log("Se modificó el usuario con nuevo email: "+result.data)
+          await sendPasswordResetEmail(getAuth(),this.emailModifica);
+          });
+       }
+       //Ahora, esta parte se hará siempre, volver a introducir los datos actualizados en las base de datos
+        const consulta =  query(collection(firebaseDB, "RolUser"), where("Correo", "==", this.emailUsuario));
+        const querySnapshot = await getDocs(consulta);
 
+          querySnapshot.forEach(async(doc) => {
+            await updateDoc(doc.ref, {
+            Correo:this.emailModifica,
+            ROL: this.roles
+          });
+        });
+        const consulta2 =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", this.emailUsuario));
+        const querySnapshot2 = await getDocs(consulta2);
+
+          querySnapshot2.forEach(async(doc) => {
+            await updateDoc(doc.ref, {
+            Correo:this.emailModifica,
+            ROL: this.roles,
+            Nombre: this.nombreModifica,
+            Apellidos: this.apellidosModifica
+          });
+
+          this.flagexito=true;
+        });
+      },
+      volverAEmpresas(){
+        this.usuariosSeleccionados=[];
+        this.flagMostrarTrabajadores=false;
+        this.nombreUsuario="";
+        this.apellidosUsuario="";
+        this.rolUserUsuario="";
+        this.nombre="";
+        this.emailUsuario="";
       }
 
 

@@ -61,7 +61,7 @@
           {text: 'Asunto',value: "Asunto"},
           {text: 'Descripción', value: "Descripcion"},
           {text: 'Estado', value: "Estado"},
-          {text: 'Fecha', value: "Fecha"}
+          {text: 'Hora / Fecha', value: "Fecha"}
         ]
       }
       },
@@ -92,8 +92,18 @@
         const consulta =  query(collection(firebaseDB, "Tickets"), where("IdEmpresa", "==", IdEmp));
         const querySnapshot = await getDocs(consulta);
         
-        querySnapshot.forEach((doc) => {
-          this.tickets.push(doc.data());
+        querySnapshot.forEach(async(doc) => {
+          await this.tickets.push(doc.data());
+        });
+
+        //Casteamos la fecha de cada ticket para darle un formato en el que mostrarlo
+        this.tickets.forEach(async function(ticket){
+          var fechita=await (ticket.Fecha).toDate()
+          ticket.Fecha = ''+ await fechita.getHours();
+          ticket.Fecha += ':'+ await fechita.getMinutes();
+          ticket.Fecha += ' / '+ await fechita.getDay();
+          ticket.Fecha += '-'+ await fechita.getMonth();
+          ticket.Fecha += '-' + await fechita.getFullYear();
         });
       },
       async marcarResuelto(){

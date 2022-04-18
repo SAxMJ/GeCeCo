@@ -50,7 +50,7 @@
                 </v-col>
 
                 <v-col cols="12" md="6">
-                  <v-text-field color="black" label="Email" v-model= "email" readonly />
+                  <v-text-field color="black" label="Email" v-model= "email" :readonly=false />
                 </v-col>
 
                 <v-col cols="12" md="6">
@@ -95,7 +95,7 @@
                 <v-text>¿Estás seguro?</v-text>
               </v-card-title>
               <v-card-text>
-                <v-text>Se enviará un correo al usuario de restablecimiento de su contraseña</v-text>
+                <v-text>Se grabarán los cambios realizados al usuario</v-text>
               </v-card-text>
               <v-btn color="red darken-1" text @click="reseteaFlags">CANCELAR</v-btn>
               <v-btn color="green darken-1" text @click="modificarUsuario">ACEPTAR</v-btn>
@@ -136,6 +136,50 @@
       </v-dialog> 
 
 
+      <v-dialog width="700" v-model="flagmodificandousuario">
+      <v-card height="50" >MODIFICAR USUARIO</v-card>
+      <v-card>
+          <v-form>
+            <v-container class="py-0">
+              <v-row align-content-center>
+                <v-col cols="12" md="4" >
+                  <v-text-field color="black" label="Nombre" v-model= "nombreModifica" :readonly=false required/>
+                </v-col> 
+
+                <v-col cols="12" md="4">
+                  <v-text-field color="black" label="Apellidos" v-model= "apellidosModifica" :readonly=false required/>
+                </v-col>
+
+                <v-col align-content-space- cols="12" md="4">
+                  <v-img align-center max-height="100" max-width="100" :src="imgurl"></v-img>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                  <v-text-field color="black" label="Email" v-model= "emailModifica" :readonly=false required />
+                </v-col>
+
+                <v-col cols="12" md="6">
+                  <v-text-field color="black" label="Empresa" v-model= "empresaModifica" readonly required/>
+                </v-col>
+
+                <v-radio-group v-model="roles">
+                  <v-radio label="Admin" value="Admin">
+                  </v-radio>
+                  <v-radio label="Trabajador" value="Trabajador">
+                  </v-radio>
+              </v-radio-group>
+
+                <v-col cols="12" class="text-right">
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+       </v-card>
+       <v-card>
+        <v-btn color="green darken-1" text @click="flagmodificauser=true">Guardar cambios</v-btn> 
+       </v-card>
+    </v-dialog> 
+
     </v-card>
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
@@ -145,7 +189,7 @@
 <script>
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
-  import {getFirestore, collection, updateDoc,doc, deleteDoc, enableMultiTabIndexedDbPersistence} from "firebase/firestore"
+  import {getFirestore, collection, updateDoc,doc, deleteDoc} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
   import { getAuth,sendPasswordResetEmail } from "firebase/auth";
   import {query, where, getDocs} from "firebase/firestore";
@@ -185,11 +229,19 @@ connectFunctionsEmulator(functions, "localhost", 5001);
         empresa: "",
         imgurl: "",
 
+        roles: "",
+        nombreModifica: "",
+        apellidosModifica: "",
+        emailModifica: "",
+        rolUserModifica: "",
+        empresaModifica: "",
+
         flaginicio: false,
         flagmodificapass:false,
         flagmodificauser:false,
         flagbajausuario: false,
-        flagexito:false
+        flagexito:false,
+        flagmodificandousuario:false,
       }
       },
     components:{
@@ -223,15 +275,16 @@ connectFunctionsEmulator(functions, "localhost", 5001);
       },
       comprueba(){
         console.log("Entro comprueba");
-        
-        if(this.seleccionados[0]){
-          //console.log("Tiene algo");
-          this.unoseleccionado=true;
-          this.GetDatosUsuario();
-        }
-        else{
-          //console.log("Esta vacio");
-          this.unoseleccionado=false;
+        if(!this.flagmodificandousuario){
+          if(this.seleccionados[0]){
+            //console.log("Tiene algo");
+            this.unoseleccionado=true;
+            this.GetDatosUsuario();
+          }
+          else{
+            //console.log("Esta vacio");
+            this.unoseleccionado=false;
+          }
         }
       },
       async GetDatosUsuario(){
@@ -264,7 +317,12 @@ connectFunctionsEmulator(functions, "localhost", 5001);
           console.log("Queremos restablecer la contraseña")
         }else if(index==1){
           console.log("Queremos modificar el usuario")
-          this.flagmodificauser=true;
+          this.flagmodificandousuario=true;
+          this.roles=this.rolUser;
+          this.nombreModifica=this.nombre;
+          this.apellidosModifica=this.apellidos;
+          this.emailModifica=this.email;
+          this.empresaModifica=this.empresa;
         }
         else if(index==2){
           console.log("Queremos dar de baja el usuario")
@@ -278,9 +336,41 @@ connectFunctionsEmulator(functions, "localhost", 5001);
         this.flagmodificapass=false;
         this.flagexito=true;
       },
-      modificarUsuario(){
-        this.flagmodificauser=false;
-        this.flagexito=true;
+      async modificarUsuario(){
+        const firebaseDB= getFirestore(firebaseApp);
+       //COMPROBAMOS AQUI LAS variableModifica JUNTO CON LAS VARIABLES NORMALES PARA HACER SOLO LAS MODIFICACIONES NECESARIAS
+        if(this.email!=this.emailModifica){
+        
+          const darDeBajaUsuario=httpsCallable(functions,"modificaCorreoUsuario");
+          darDeBajaUsuario({correo1: this.email, correo2: this.emailModifica}).then(async(result) => {
+            
+          console.log("Se modificó el usuario con nuevo email: "+result.data)
+          await sendPasswordResetEmail(getAuth(),this.emailModifica);
+          });
+       }
+       //Ahora, esta parte se hará siempre, volver a introducir los datos actualizados en las base de datos
+        const consulta =  query(collection(firebaseDB, "RolUser"), where("Correo", "==", this.email));
+        const querySnapshot = await getDocs(consulta);
+
+          querySnapshot.forEach(async(doc) => {
+            await updateDoc(doc.ref, {
+            Correo:this.emailModifica,
+            ROL: this.roles
+          });
+        });
+        const consulta2 =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", this.email));
+        const querySnapshot2 = await getDocs(consulta2);
+
+          querySnapshot2.forEach(async(doc) => {
+            await updateDoc(doc.ref, {
+            Correo:this.emailModifica,
+            ROL: this.roles,
+            Nombre: this.nombreModifica,
+            Apellidos: this.apellidosModifica
+          });
+
+          this.flagexito=true;
+        });
       },
       async darDeBajaUsuario(){
         const firebaseDB= getFirestore(firebaseApp);
