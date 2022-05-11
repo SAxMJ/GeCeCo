@@ -1,23 +1,11 @@
 <template>
   <v-container>
+    
     <v-card>
-      {{recuperaTickets}}
-      <v-container
-        id="regular-tables-view"
-        fluid
-        tag="section"
-      >
-        <view-intro
-          heading="Simple Tables"
-          link="components/simple-tables"
-        />
-
-        <material-card
-          icon="mdi-clipboard-text"
-          icon-small
-          title="Simple Table"
-          color="accent"
-        >
+      <v-card class="black">{{recuperaTickets}}</v-card>
+      <v-container id="regular-tables-view" fluid tag="section">
+        <view-intro heading="Simple Tables" link="components/simple-tables"/>
+        <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
           <v-simple-table>
             <thead> <!--ESTA ESTA LA CABECERA DE LA TABLA-->
               <tr>
@@ -44,13 +32,8 @@
           <td class="text-left">{{ ticket.Asunto }}</td>
           <td class="text-left">{{ ticket.Descripcion }}</td>
           <td class="text-left">{{ ticket.Estado }}</td>
+          <td class="text-left">{{ ticket.Fecha }}</td>
           </tr>
-          <tr
-            v-for="fecha in fechas"
-            :key="fecha"
-            >
-        <td class="text-left">{{fecha }}</td>
-        </tr>
       </tbody>
           </v-simple-table>
         </material-card>
@@ -58,8 +41,7 @@
       </v-container>
     </v-card>
     
-
-
+    <v-btn color="primary" dark @click="dialog=true"> Nuevo ticket</v-btn>
 
    <v-row justify="center">
     <v-dialog
@@ -67,50 +49,29 @@
       persistent
       max-width="600px"
     >
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="primary"
-          dark
-          v-bind="attrs"
-          v-on="on"
-        >
-          Nuevo ticket
-        </v-btn>
-      </template>
       <v-card>
-        <v-card-title>
-          <span class="text-h5">Nuevo ticket</span>
+        <v-card-title class="justify-center">
+          <span class="text-h5" >Nuevo ticket</span>
         </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  v-model="asunto"
-                  label="Asunto"
-                  outlined
-                  required
-                ></v-text-field>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field v-model="asunto" label="Asunto" outlined required></v-text-field>
               </v-col>
               </v-row>
               <v-row>
-              <v-textarea
-              v-model="descripcion"
-              label="Descripción de la incidencia"
-              counter
-              maxlength="300"
-              full-width
-              single-line
-              outlined
-              required
-              ></v-textarea>
+                <v-textarea v-model="descripcion" label="Descripción de la incidencia" counter maxlength="300" full-width single-line 
+                outlined required>
+                </v-textarea>
             </v-row>
           </v-container>
           <small>* Indica campo requerido</small>
+        </v-card-text>
+        <v-card-text>
+          <v-alert dense outlined type="error" v-if="error">
+            {{error}}
+          </v-alert>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -160,7 +121,8 @@
         asunto:'',
         descripcion:'',
         fechas:[],
-        tickets:[]
+        tickets:[],
+        error: '',
       }
       },
     components:{
@@ -180,11 +142,19 @@
           //this.fechas.push(doc.data('Fecha'));
         });
 
+        this.tickets.forEach(async function(ticket){
+          var fechita=await (ticket.Fecha).toDate()
+          ticket.Fecha = ''+ await fechita.getHours();
+          ticket.Fecha += ':'+ await fechita.getMinutes();
+          ticket.Fecha += ' / '+ await fechita.getDay();
+          ticket.Fecha += '-'+ await fechita.getMonth();
+          ticket.Fecha += '-' + await fechita.getFullYear();
+        });
       }
     },
     methods:{
       enviaTicket(){
-
+        this.error='';
         const firebaseDB= getFirestore(firebaseApp);
         const auth = getAuth();
         if(this.descripcion && this.asunto){
@@ -198,6 +168,7 @@
 
         }else{
           console.log("Hay campos vacíos");
+          this.error="Hay campos vacíos";
         }
       },
       cerrarDialogo(){

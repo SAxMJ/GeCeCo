@@ -25,7 +25,7 @@
         <v-list-item-title>NombreUsuario</v-list-item-title>
         <v-btn
           icon
-          @click.stop="mini = !mini"
+          @click.stop="mini = mini"
         >
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
@@ -67,7 +67,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
           { title: 'Tickets', icon: 'mdi-ticket', path: '/ticketsusuario/1'},
           { title: 'Usuario', icon: 'mdi-account', path: '/miusuario/1' },
         ],
-        mini: true,
+        mini: false,
         fotourl: "",
         opciones:[
           {title: 'Cerrar sesión'}

@@ -1,4 +1,5 @@
 <template>
+<v-main>
   <v-container>
     <v-card>TICKETS DE LA EMPRESA</v-card>
     <v-card>
@@ -36,6 +37,7 @@
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
   </v-container>
+  </v-main>
 </template>
 
 <script>

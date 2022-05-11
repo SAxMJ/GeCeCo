@@ -1,5 +1,5 @@
 <template>
-   <v-container fluid fill-height>
+   <v-container>
       <v-layout align-center justify-center >
          <v-flex xs12 sm8 md4>
             <v-card elevation="24" shaped tile>
@@ -30,7 +30,7 @@
                               </router-link>
                            </form>
                         </v-card-text>
-                        <v-alert dense outlined type="error" v-if="error">
+                           <v-alert dense outlined type="error" v-if="error">
                               {{error}}
                            </v-alert>
                      </v-card>

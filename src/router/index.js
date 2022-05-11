@@ -92,7 +92,27 @@ const routes = [
     path: '/usuariosempresa/:rol',
     name: 'usuariosempresa',
     component: () => import('../views/superusuario/UsuariosEmpresa.vue')
-  }
+  },
+  {
+    path: '/superusuarios/:rol',
+    name: 'superusuarios',
+    component:() => import('../views/superusuario/SuperUsuarios.vue')
+  },
+  {
+    path: '/verusuario/:rol/:correoUsuario',
+    name: 'verusuario',
+    component:() => import('../views/admin/VerUsuario.vue')
+  },
+  {
+    path: '/fichaempresa/:rol/:idEmpresa',
+    name: 'fichaEmpresa',
+    component:() => import('../views/superusuario/FichaEmpresa.vue')
+  },
+  {
+    path: '/verusuariosdeempresa/:rol/:idEmpresa',
+    name: 'verusuariosdeempresa',
+    component:() => import('../views/superusuario/VerUsuariosDeEmpresa.vue')
+  },
 
   
 ];
@@ -159,6 +179,10 @@ function getRol(to,next,user){
 }
 
 function ejecutaRuta(rol,to,next){
+    
+  //Dividiremos las cadenas parapoder recuperar los diferentes argumentos que pasamos como parámetros, como puede ser un idUsuario
+    var tempCadena=to.path;
+    var x=tempCadena.split("/"); //nos interesa el tercer elemento x[2]
 
     //Cualquier rol puede acceder a estas URL
     if(rol==1){
@@ -182,7 +206,7 @@ function ejecutaRuta(rol,to,next){
         next('/null');
       }
     }
-
+    console.log("To path: "+to.path+ " X3 "+x[3])
     //Admin y superusuario pueden acceder a estas URL
     if(rol==2){
       console.log("EL ROL ES");
@@ -211,7 +235,10 @@ function ejecutaRuta(rol,to,next){
       else if(to.path==='/ticketsadmin/2'  && to.path!=='ticketsadmin/1' && to.path!=='ticketsadmin/3'){ //Controlaremos que solo si es un admin pueda acceder
         next()
       }
-      else if(to.path==='/registeradmin/2'  && to.path!=='registeradmin/1' && to.path!=='registeradmin/3'){ //Controlaremos que solo si es un admin pueda acceder
+      else if(to.path==='/registeradmin/2' && to.path!=='registeradmin/1' && to.path!=='registeradmin/3'){ //Controlaremos que solo si es un admin pueda acceder
+        next()
+      }
+      else if(to.path==='/verusuario/2/'+x[3] && to.path!=='registeradmin/1' && to.path!=='registeradmin/3'){ //Controlaremos que solo si es un admin pueda acceder
         next()
       }
       else if(to.path==='/'){
@@ -266,6 +293,18 @@ function ejecutaRuta(rol,to,next){
         next()
       }
       else if(to.path==='/registerempresa/3'  && to.path!=='registerempresa/1' && to.path!=='registerempresa/2'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
+      }
+      else if(to.path==='/superusuarios/3'  && to.path!=='superusuarios/1' && to.path!=='superusuarios/2'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
+      }
+      else if(to.path==='/fichaempresa/3/'+x[3]  && to.path!=='fichaempresa/1' && to.path!=='fichaempresa/2'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
+      }
+      else if(to.path==='/verusuariosdeempresa/3/'+x[3]  && to.path!=='verusuariosdeempresa/1' && to.path!=='verusuariosdeempresa/2'){ //Controlaremos que solo si es un admin pueda acceder
         console.log(to.path);
         next()
       }

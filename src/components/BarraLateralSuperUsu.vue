@@ -2,7 +2,7 @@
       <v-navigation-drawer app  :mini-variant.sync="mini" permanent class="secondary">
         <v-list-item class="px-2" dark>
         <v-list-item-avatar>
-          <v-img src="https://randomuser.me/api/portraits/men/85.jpg">
+          <v-img :src="fotourl">
            <div class="text-center">
                 <v-menu offset-y>
                   <template v-slot:activator="{ on, attrs }">
@@ -22,10 +22,10 @@
           </v-img>
         </v-list-item-avatar>
 
-        <v-list-item-title>NombreUsuario</v-list-item-title>
+        <v-list-item-title>{{nombreusuario}}</v-list-item-title>
         <v-btn
           icon
-          @click.stop="mini = !mini"
+          @click.stop="mini = mini"
         >
           <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
@@ -48,22 +48,31 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      {{getUrlFotoPerfil}}
       </v-navigation-drawer>
 </template>
 
 <script>
 import { getAuth, signOut } from "firebase/auth";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import {query, where, getDocs} from "firebase/firestore";
+import {getFirestore, collection, updateDoc,doc, deleteDoc, addDoc} from "firebase/firestore"
+import firebaseApp from '../scripts/firebase'
+
 
   export default {
     data () {
       return {
+        fotourl:"",
         drawer: true,
+        nombreusuario: "",
         items: [
           { title: 'Inicio', icon: 'mdi-home', path: '/paginainicio/3',},
           { title: 'Empresas', icon: 'mdi-domain', path: '/empresas/3' },
+          { title: 'Super Usuarios', icon: 'mdi-face-agent', path: '/superusuarios/3' },
           { title: 'MiUsuario', icon: 'mdi-account', path: '/miusuario/3' },
         ],
-        mini: true,
+        mini: false,
         opciones:[
           {title: 'Cerrar sesión'}
         ]
@@ -76,6 +85,40 @@ import { getAuth, signOut } from "firebase/auth";
           }).catch((error) => {
             console.log("Error, no se cerró sesíon: "+error)
           });
+        }
+      },
+      computed:{
+          async getUrlFotoPerfil(){ //Método para obtener la url de la foto de perfil
+            const firebaseDB= getFirestore(firebaseApp);
+
+            var photo;
+            var auth=getAuth();
+            var user=auth.currentUser;
+
+            
+            if(user.photoURL){
+              photo = "FotosDeUsuarios/"+user.uid;
+            }else{
+              photo = "porDefecto.png"
+            }
+
+            console.log("LA RUTITA ES: "+photo);
+            //Vamos a recuperar la foto de perfil correspondiente al usuario
+            const storage = getStorage();
+            const imagesRef = ref(storage,photo);
+
+            //Con esta función obtenemos la url
+            await getDownloadURL(imagesRef).then((url)=>{
+              this.fotourl=url;
+            });
+
+            console.log("EES"+auth.currentUser.email)
+            const consulta =  query(collection(firebaseDB, "SuperUsuarios"), where("Correo", "==",""+ auth.currentUser.email));
+            const querySnapshot = await getDocs(consulta);
+            querySnapshot.forEach((doc) => {
+              this.nombreusuario=doc.get("Nombre");
+              console.log("Nombre "+ this.nombreusuario)
+            });
         }
       }
   }

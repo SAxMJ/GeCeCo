@@ -81,6 +81,46 @@ exports.modificaCorreoUsuario=functions.https.onCall(async(data,context)=>{
 })
 
 
+exports.estadoDeLaMaquina=functions.https.onCall(async(data,context)=>{
+
+  const si=require('systeminformation');
+  console.log("Aqui si que entro, funcion estado maquina")
+
+  
+  const cpu = await si.currentLoad();
+  const ram = await si.mem();
+  const disk= await si.fsSize()
+  const connexion= await si.networkStats()
+  const grafica= await si.graphics()
+  const osinfo= await si.osInfo()
+  const cpu2 = await si.cpu();
+  const temp= await  si.cpuTemperature();
+  
+  var informacionSistema={
+    laCpu:cpu,
+    laRam:ram,
+    elDisk:disk[0],
+    laConexion:connexion,
+    laGpu:grafica,
+    laOsinfo:osinfo,
+    laCpu2:cpu2
+  }
+
+  console.log(osinfo);
+  
+  //console.log(disk);
+  //console.log(cpu.currentload);
+  //console.log(connexion);
+  //console.log(grafica);
+  //console.log(disk);
+  //console.log(osinfo);
+  //console.log(ram);
+
+  
+  console.log("LLego al return");
+
+  return informacionSistema;
+})
 
 
 function mailRestablecimiento(email,link){

@@ -280,7 +280,7 @@ export default({
 
         },
         recargaPagina(){
-            location.reload();
+           this.$router.push('/empresas/3');
         },
         imagenSeleccionada(evento){
           this.imagenSel=evento.target.files[0];
