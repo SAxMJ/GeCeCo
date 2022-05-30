@@ -2,6 +2,8 @@ const functions = require("firebase-functions");
 const admin=require('firebase-admin');
 admin.initializeApp();
 const nodemailer = require("nodemailer");
+const { serverTimestamp } = require("firebase/firestore");
+
 
 
 //FUNCIÓN PARA REGISTRAR USUARIOS COMO ADMINISTRADOR
@@ -80,48 +82,255 @@ exports.modificaCorreoUsuario=functions.https.onCall(async(data,context)=>{
   return newCorreo;
 })
 
+exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Monitorizacion/{idMonit}').onCreate(async (snap, context) => {
+    
+    var rutaArchivo=snap.ref.path.split("/");
+    var limite="";
+    var tipoElemento="";
+    var valor="";
+    var tipo="";
+    var idAdmin="";
+    //Obtenemos el id de la empresa donde se ha producido la nueva monitorizacion
+    var idEmpresa = (await admin.firestore().collection("Equipos").doc(rutaArchivo[1]).get()).data().IdEmpresa;
+    var IdUsuario = (await admin.firestore().collection("Equipos").doc(rutaArchivo[1]).get()).data().IdUsuario;
+    var IdEquipo = idEmpresa+""+IdUsuario;
 
-exports.estadoDeLaMaquina=functions.https.onCall(async(data,context)=>{
+    //Ahora vamos a recuperar la colección de alarmas del dicha empresa
+    admin.firestore().collection('Alertas').where("IdEmpresa", "==", idEmpresa).get().then((snapshot) => {
 
-  const si=require('systeminformation');
-  console.log("Aqui si que entro, funcion estado maquina")
+      //Ahora por cada una de las alertas creadas comprobaremos el valor segun la alerta recuperada
+      snapshot.forEach(async (doc) => { 
+        console.log(doc.data())
+        limite=doc.data().Limite;
+        tipoElemento=doc.data().TipoElemento;
+        valor=doc.data().Valor;
+        tipo=doc.data().Tipo;
+        idAdmin=doc.data().IdAdmin;
 
-  
-  const cpu = await si.currentLoad();
-  const ram = await si.mem();
-  const disk= await si.fsSize()
-  const connexion= await si.networkStats()
-  const grafica= await si.graphics()
-  const osinfo= await si.osInfo()
-  const cpu2 = await si.cpu();
-  const temp= await  si.cpuTemperature();
-  
-  var informacionSistema={
-    laCpu:cpu,
-    laRam:ram,
-    elDisk:disk[0],
-    laConexion:connexion,
-    laGpu:grafica,
-    laOsinfo:osinfo,
-    laCpu2:cpu2
-  }
+        if(tipo=="CPU"){
 
-  console.log(osinfo);
-  
-  //console.log(disk);
-  //console.log(cpu.currentload);
-  //console.log(connexion);
-  //console.log(grafica);
-  //console.log(disk);
-  //console.log(osinfo);
-  //console.log(ram);
+          if(tipoElemento=="Carga"){
+            if(limite=="Supera"){
+              if(snap.data().CPU.currentLoad > valor){
+               console.log("SuperaCarga")
+               admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                 IdAdmin: idAdmin,
+                 IdEquipo: IdEquipo,
+                 Limite: limite,
+                 Tipo: tipo,
+                 TipoElemento: tipoElemento,
+                 ValorLimite: valor,
+                 ValorObtenido: snap.data().CPU.currentLoad,
+                 Fecha: serverTimestamp(),
+                 Estado: "No resuelta"
+               })
+              }
+            }
+            else if(limite=="Menor"){
+              if(snap.data().CPU.currentLoad < valor){
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: snap.data().CPU.currentLoad,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+          }
 
-  
-  console.log("LLego al return");
+          else if(tipoElemento=="Carga de usuarios"){
+            if(limite=="Supera"){
+              if(snap.data().CPU.currentLoadUser > valor){
+                console.log("SuperaCargaUsuarios")
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: snap.data().CPU.currentLoad,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+            else if(limite=="Menor"){
+              if(snap.data().CPU.currentLoadUser < valor){
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: snap.data().CPU.currentLoad,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+          }
 
-  return informacionSistema;
-})
+          else if(tipoElemento=="Carga de sistema"){
+            if(limite=="Supera"){
+              if(snap.data().CPU.currentLoadSystem > valor){
+                console.log("SuperaCargaUsuarios")
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: snap.data().CPU.currentLoad,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+            else if(limite=="Menor"){
+              if(snap.data().CPU.currentLoadSystem < valor){
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: snap.data().CPU.currentLoad,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+          }
+        }
 
+        if(tipo=="DISCO"){
+
+          if(tipoElemento=="Usado"){
+            if(limite=="Supera"){
+              if(snap.data().DISK[0].use>valor){
+                console.log("Se supera el límite de disco ocupado")
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: snap.data().DISK[0].use,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+          }
+
+          if(tipoElemento=="Disponible"){
+            if(limite=="Menor"){
+              var tDisco=snap.data().DISK[0].size * (9.31*Math.pow(10, -10));
+              var dUsado=snap.data().DISK[0].used * (9.31*Math.pow(10, -10));
+              var porcDisp=(dUsado*100)/tDisco;
+              porcDisp=100-porcDisp;
+
+              if(porcDisp<valor){
+                console.log("El porentaje disponible es menor que el límite establecido ")
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: porcDisp,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+          }
+        }
+
+        if(tipo=="RAM"){
+
+          if(tipoElemento=="Libre"){
+            if(limite=="Menor"){
+              var ramtotal=snap.data().RAM.total;
+              var ramlibre=snap.data().RAM.free;
+              var porcRamLibre=(ramlibre*100)/ramtotal;
+
+              if(porcRamLibre<valor){
+                console.log("El porcentaje de la ram libre es menor que el tope")
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: porcRamLibre,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+          }
+
+          if(tipoElemento=="Usada"){
+            if(limite=="Supera"){
+              var ramtotal=snap.data().RAM.total;
+              var ramusada=snap.data().RAM.used;
+              var porcRamUsada=(ramusada*100)/ramtotal;
+
+              if(porcRamUsada>valor){
+                console.log("El porcentaje de la ram usadaa es mayor que el tope")
+                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                  IdAdmin: idAdmin,
+                  IdEquipo: IdEquipo,
+                  Limite: limite,
+                  Tipo: tipo,
+                  TipoElemento: tipoElemento,
+                  ValorLimite: valor,
+                  ValorObtenido: porcRamUsada,
+                  Fecha: serverTimestamp(),
+                  Estado: "No resuelta"
+                })
+              }
+            }
+          }
+        }
+
+        if(tipo=="PROCESOS"){
+          if(snap.data().PROCESOS>valor){
+            console.log("Se ha superado el número de procesos")
+            admin.firestore().collection("AvisosDeAlerta").doc("").set({
+              IdAdmin: idAdmin,
+              IdEquipo: IdEquipo,
+              Tipo: tipo,
+              ValorLimite: valor,
+              ValorObtenido: snap.data().PROCESOS,
+              Fecha: serverTimestamp(),
+              Estado: "No resuelta"
+            })
+          }
+        }
+
+      });
+    }).catch((err) => {
+      console.log('Error getting documents', err);
+    });
+
+
+    console.log(idEmpresa);
+    //console.log(IdUsuario);
+});
 
 function mailRestablecimiento(email,link){
 

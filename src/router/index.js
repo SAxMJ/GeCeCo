@@ -113,6 +113,11 @@ const routes = [
     name: 'verusuariosdeempresa',
     component:() => import('../views/superusuario/VerUsuariosDeEmpresa.vue')
   },
+  {
+    path: '/verequipo/:rol/:idEquipo',
+    name: 'verequipo',
+    component:() => import('../views/admin/VerEquipo.vue')
+  },
 
   
 ];
@@ -245,6 +250,10 @@ function ejecutaRuta(rol,to,next){
           next();
       }
       else if(to.path==='/cambiarpassword/2'  && to.path!=='cambiarpassword/3' && to.path!=='cambiarpassword/1'){ //Controlaremos que solo si es un admin pueda acceder
+        console.log(to.path);
+        next()
+      }
+      else if(to.path==='/verequipo/2/'+x[3]  && to.path!=='verequipo/3' && to.path!=='verequipo/1'){ //Controlaremos que solo si es un admin pueda acceder
         console.log(to.path);
         next()
       }

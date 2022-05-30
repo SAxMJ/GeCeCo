@@ -45,19 +45,27 @@
         </v-card-title>
         <v-container>
         <v-card-text>
-          <v-select v-model="tipo" :items="tipoAlerta" :error-messages="errors" label="Tipo" data-vv-name="select" required></v-select>
+          <v-select v-if="tipo!=='PROCESOS'" v-model="tipo" :items="tipoAlerta" :error-messages="errors" label="Tipo" data-vv-name="select" required></v-select>
         </v-card-text>
         <v-card-text>
           <v-select v-if="tipo==='CPU'" v-model="tipoElemento" :items="tiposCPU" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
           <v-select v-if="tipo==='RAM'" v-model="tipoElemento" :items="tiposRAM" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
           <v-select v-if="tipo==='DISCO'" v-model="tipoElemento" :items="tiposDISCO" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
+
         </v-card-text>
         <v-card-text>
-          <v-select v-model="limite" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
+          <v-select v-if="tipo!=='PROCESOS'" v-model="limite" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
         </v-card-text>
-         <v-card-text>
-          <v-slider v-model="valor" label= "% "></v-slider>
+
+         <v-card-text v-if="tipo!=='PROCESOS'">
+           <div>VALOR (%)</div>
+           <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valor="valor"></v-text-field>
         </v-card-text>
+        <v-card-text v-if="tipo==='PROCESOS'">
+           <div>NUM PROCESOS</div>
+           <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valor="valor"></v-text-field>
+        </v-card-text>
+       
         <v-card-text>
           <v-text-field v-model="descripcion" label="Descripción" outlined required></v-text-field>
         </v-card-text>
@@ -95,7 +103,8 @@
           <v-select v-model="limiteModifica" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
         </v-card-text>
          <v-card-text>
-          <v-slider v-model="valorModifica" label= "% "></v-slider>
+           <div>VALOR (%)</div>
+           <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valorModifica="valorModifica"></v-text-field>
         </v-card-text>
         <v-card-text>
           <v-text-field v-model="descripcionModifica" label="Descripción" outlined required></v-text-field>
@@ -213,7 +222,7 @@
         error: '',
         tipo: '',
         tipoElemento:'',
-        valor: '',
+        valor: 0,
         limite: '', 
 
         descripcionModifica:'',
@@ -231,7 +240,7 @@
         tipoAlerta: [
           'CPU',
           'RAM',
-          'RED',
+          'PROCESOS',
           'DISCO',
         ],
         Limites: [
@@ -245,11 +254,18 @@
         ],
         tiposRAM:[
           'Libre',
+          'Usada'
         ],
         tiposDISCO:[
           'Usado',
           'Disponible',
         ],
+
+      number: 0,
+      numberRule: val => {
+        if(val < 0) return 'El numero debe ser positivo'
+      return true
+    }
       }
       },
     components:{
@@ -271,9 +287,18 @@
     methods:{
       async almacenaAlerta(){
 
+        var idEmpresa="";
         this.error='';
         const firebaseDB= getFirestore(firebaseApp);
         const auth = getAuth();
+
+        const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
+        const querySnapshot = await getDocs(consulta);
+        
+        querySnapshot.forEach(async (doc) => {
+           idEmpresa=doc.get("IdEmpresa");
+        });
+
         if(this.descripcion && this.tipo && this.valor && this.limite && this.tipoElemento){ //Almacenamos en la base de datos la nueva alerta
           
           try {
@@ -284,6 +309,32 @@
               Limite: this.limite,
               Tipo: this.tipo,
               TipoElemento: this.tipoElemento,
+              IdEmpresa:idEmpresa,
+            });
+
+          console.log("Se registró la alerta: ", docRef.id);
+
+          await updateDoc(docRef, {
+            IdAlerta: docRef.id
+          });
+
+          this.boolNuevaAlerta=false;
+          this.flagExitoCrearAlerta=true;
+          } catch (e) {
+            console.error("Error adding document: ", e);
+          }
+
+        }
+        else if(this.tipo=="PROCESOS" && this.descripcion){
+
+          try {
+            const docRef = await addDoc(collection(firebaseDB, "Alertas"), {
+              Descripcion: this.descripcion,
+              IdAdmin: auth.currentUser.uid,
+              Valor: this.valor,
+              Limite:"Supera",
+              Tipo: this.tipo,
+              IdEmpresa:idEmpresa,
             });
 
           console.log("Se registró la alerta: ", docRef.id);
