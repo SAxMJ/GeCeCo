@@ -1,39 +1,76 @@
 <template>
 <v-main>
   <v-container>
-    <v-card>TICKETS DE LA EMPRESA</v-card>
-    <v-card>
-      <v-card class="black">{{recuperaTicketsTrabajadores}}</v-card>
-      <v-container
-        id="regular-tables-view"
-        fluid
-        tag="section"
-      >
-          <v-data-table
-            v-model="seleccionados"
-            :headers="headers"
-            :items="tickets"
-            :single-select="singleSelect"
-            item-key="Asunto"
-            show-select
-            class="elevation-1"
-          >
-
-           <template v-slot:top>
-      <v-switch
-        v-model="singleSelect"
-        label="Single select"
-        class="pa-3"
-      ></v-switch>
-    </template>
-  </v-data-table>
-
-        <div class="py-3" />
+    <v-card  class="grey lighten-2">
+      
+      <v-container>
+        <v-card>TICKETS DE LA EMPRESA</v-card>
       </v-container>
-
-       <v-btn color="primary" dark  @click="marcarResuelto">Resuelto</v-btn>
+      
+      <v-container>
+      <v-container id="regular-tables-view" fluid tag="section">
+      <v-card class="black">{{recuperaTicketsTrabajadores}}
+        <v-row>
+        <v-col cols="5" md="8" >
+        </v-col>
+        <v-col cols="5" md="2" >
+        </v-col>
+        <v-col cols="5" md="1" >
+        </v-col>
+        <v-col cols="5" md="1" >
+          <v-btn small dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
+        </v-col>
+        <v-col cols="5" md="1" >
+        </v-col>
+        </v-row>
+      </v-card>
+      </v-container>
+      
+      <v-container>
+      <v-data-table v-model="seleccionados" :headers="headers" :items="tickets" :single-select="singleSelect" item-key="Asunto" show-select class="elevation-1">
+      <template v-slot:top>
+        <v-switch
+          v-model="singleSelect"
+          label="Single select"
+          class="pa-3"
+        ></v-switch>
+      </template>
+      </v-data-table>
+      </v-container>
+    <div class="py-3" />
+    </v-container>
     </v-card>
     
+    <v-dialog width="500" v-model="boolConfirmacion">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-text>¿Estás seguro?</v-text>
+              </v-card-title>
+              <v-card-text>
+                <v-text>Se marcarán el/los ticket(s) como resueltos</v-text>
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="boolConfirmacion=false">CANCELAR</v-btn>
+              <v-btn color="green darken-1" text @click="marcarResuelto">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog>
+
+        <v-dialog width="500" v-model="boolExito">
+        <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-text>HECHO</v-text>
+              </v-card-title>
+              <v-card-text>
+                <v-text>Se actualizaron correctamente los tickets</v-text>
+              </v-card-text>
+              <v-btn color="green darken-1" text @click="recargarPagina">ACEPTAR</v-btn>
+          </v-card>
+        </template>
+        </v-dialog> 
+
+
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
   </v-container>
@@ -64,7 +101,9 @@
           {text: 'Descripción', value: "Descripcion"},
           {text: 'Estado', value: "Estado"},
           {text: 'Hora / Fecha', value: "Fecha"}
-        ]
+        ],
+        boolConfirmacion:false,
+        boolExito:false,
       }
       },
     components:{
@@ -117,12 +156,22 @@
           const consulta =  query(collection(firebaseDB, "Tickets"), where("Asunto", "==", this.seleccionados[seleccionado].Asunto));
           const querySnapshot = await getDocs(consulta);
 
-          querySnapshot.forEach((doc) => {
-            updateDoc(doc.ref, {
+          querySnapshot.forEach(async(doc) => {
+            await updateDoc(doc.ref, {
             Estado:"Resuelta"
           });
         });
         }
+
+        this.boolExito=true;
+      },
+      comprobarSeleccionados(){
+        if(this.seleccionados[0].Asunto){
+          this.boolConfirmacion=true;
+        }
+      },
+      recargarPagina(){
+        location.reload();
       }
 
     }

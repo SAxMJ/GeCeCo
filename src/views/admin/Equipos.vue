@@ -1,10 +1,14 @@
 <template>
 <v-main>
   <v-container app>
-    <v-card>EQUIPOS DE LA EMPRESA</v-card>
     <v-card class="grey lighten-2">
+      <v-container>
+        <v-card>EQUIPOS DE LA EMPRESA</v-card>
+      </v-container>
+      <v-container>
+        
       <v-card class="black">{{recuperaIDEmpresaAdmin}}
-        <v-row justify="right">
+        <v-row>
         <v-col cols="5" md="8" >
         </v-col>
         <v-col cols="5" md="2" >
@@ -12,12 +16,13 @@
         <v-col cols="5" md="1" >
         </v-col>
         <v-col cols="5" md="1" >
-          <v-btn small class="green" @click="boolNuevoEquipo=true"><v-icon>mdi-plus-box-outline</v-icon></v-btn> 
+          <v-btn small dark class="green" @click="boolNuevoEquipo=true"><v-icon>mdi-plus-box-outline</v-icon></v-btn> 
         </v-col>
         <v-col cols="5" md="1" >
         </v-col>
         </v-row>
       </v-card>
+      </v-container>
 
       <v-container id="regular-tables-view" fluid tag="section">
         <v-data-table  v-model="seleccionados" :headers="headers" :items="equipos" :single-select="true" item-key="IdEquipo" class="elevation-1">
@@ -92,6 +97,7 @@ connectFunctionsEmulator(functions, "localhost", 5001);
   export default{
     data (){
       return{
+        error:"",
         seleccionados: [],
         singleSelect: true,
         rol: this.$route.params.rol,

@@ -3,16 +3,17 @@
 <v-container app>
     <div>
     <v-card>USUARIOS DE LA EMPRESA</v-card>
-    <v-card class="grey lighten-2"> {{recuperaUsuariosPorIdEmpresa}}
-     <v-card class="black"></v-card>
+    <v-card class="grey lighten-2"> 
+
       <v-container id="regular-tables-view" fluid tag="section">
+         <v-card class="black">{{recuperaUsuariosPorIdEmpresa}}</v-card>
           <v-data-table  v-model="usuariosSeleccionados" :headers="headerUsuarios" :items="usuarios" :single-select="true" item-key="Correo"   show-select class="elevation-1">
           <template v-slot:top>
           </template>
           </v-data-table>
         <div class="py-3" />
-      </v-container>
-
+   
+  </v-container>
       <v-container v-if="usuariosSeleccionados.Correo!==null"> 
         {{compruebaUsuarios()}}
       <v-row justify="center">

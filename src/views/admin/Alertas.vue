@@ -2,8 +2,8 @@
 <v-main>
 <div>
   <v-container>
-    
-    <v-card>
+    <v-card class="grey lighten-2">
+      <v-container>
       <v-card class="black">{{recuperaAlertas}}
         <v-row>
         <v-col cols="20" md="8" >
@@ -11,20 +11,22 @@
         <v-col cols="20" md="9" >
         </v-col>
         <v-col cols="20" md="1" >
-          <v-btn small class="green" @click="boolNuevaAlerta=true"><v-icon medium>mdi-alert-plus</v-icon></v-btn>
+          <v-btn small dark class="green" @click="boolNuevaAlerta=true"><v-icon medium>mdi-alert-plus</v-icon></v-btn>
         </v-col>
          <v-col cols="20" md="1" >
-          <v-btn small class="red" @click="compruebaAlertaSeleccionada(1)"><v-icon medium>mdi-alert-minus</v-icon></v-btn>
+          <v-btn small dark class="red" @click="compruebaAlertaSeleccionada(1)"><v-icon medium>mdi-alert-minus</v-icon></v-btn>
         </v-col>
         <v-col cols="20" md="1" >
-          <v-btn small class="orange" @click="compruebaAlertaSeleccionada(2)"><v-icon medium>mdi-pencil</v-icon></v-btn>
+          <v-btn small dark class="orange" @click="compruebaAlertaSeleccionada(2)"><v-icon medium>mdi-pencil</v-icon></v-btn>
         </v-col>
         <v-col cols="20" md="1" >
          </v-col>  
         </v-row>
-
       </v-card>
+      </v-container>
+
       <v-container id="regular-tables-view" fluid tag="section">
+         <v-card>ALERTAS CREADAS</v-card>
         <view-intro heading="Simple Tables" link="components/simple-tables"/>
         <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
         <v-data-table  v-model="alertaSeleccionada" :headers="cabeceras" :items="alertas" :single-select="true" item-key="IdAlerta" show-select class="elevation-1">
@@ -35,6 +37,20 @@
         </material-card>
         <div class="py-3" />
       </v-container>
+      
+      
+        <v-container id="regular-tables-view" fluid tag="section">
+          <v-card>AVISOS DE ALERTAS</v-card>
+          <view-intro heading="Simple Tables" link="components/simple-tables"/>
+          <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
+          <v-data-table  v-model="avisoSeleccionados" :headers="cabecerasAvisos" :items="avisos" :single-select="true" item-key="IdAlerta" show-select class="elevation-1">
+              <template v-slot:top>
+              </template>
+              </v-data-table>
+              <div class="py-3" />
+          </material-card>
+          <div class="py-3" />
+        </v-container>
     </v-card>
 
    <v-row justify="center">
@@ -197,7 +213,7 @@
   
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
-  import {getFirestore, collection, addDoc, updateDoc, deleteDoc} from "firebase/firestore"
+  import {getFirestore, collection, addDoc, updateDoc, deleteDoc, orderBy} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
   import { getAuth } from "firebase/auth";
   import {query, where, getDocs, serverTimestamp  } from "firebase/firestore";
@@ -218,7 +234,9 @@
         rol: this.$route.params.rol,
         descripcion:'',
         alertas:[],
+        avisos:[],
         alertaSeleccionada:[],
+        avisoSeleccionados:[],
         error: '',
         tipo: '',
         tipoElemento:'',
@@ -236,6 +254,16 @@
           {text: 'Descripcion', value: "Descripcion"},
           {text: 'Limite', value: "Limite"},
           {text: 'Valor', value: "Valor"},
+        ],
+        cabecerasAvisos:[
+          {text: 'IdEquipo',value: "IdEquipo"},
+          {text: 'Tipo', value: "Tipo"},
+          {text: 'TipoElemento', value: "TipoElemento"},
+          {text: 'Limite', value: "Limite"},
+          {text: 'Valor limite', value: "ValorLimite"},
+          {text: 'Valor registrado', value: "ValorObtenido"},
+          {text: 'Fecha / Hora', value: "Fecha"},
+          {text: 'Estado', value: "Estado"},
         ],
         tipoAlerta: [
           'CPU',
@@ -282,6 +310,27 @@
         querySnapshot.forEach((doc) => {
           this.alertas.push(doc.data());
         });
+
+
+        const avisosRef = collection(firebaseDB, 'AvisosDeAlerta');
+        console.log(auth.currentUser.uid)
+        const consulta2 =  query(avisosRef, where("IdAdmin", "==", auth.currentUser.uid), orderBy("Fecha","asc"));
+        const querySnapshot2 = await getDocs(consulta2);
+        
+        querySnapshot2.forEach((doc) => {
+          this.avisos.push(doc.data());
+        });
+
+        //Casteamos la fecha de cada ticket para darle un formato en el que mostrarlo
+        this.avisos.forEach(async function(aviso){
+          var fechita=await (aviso.Fecha).toDate()
+          aviso.Fecha = ''+ await fechita.getHours();
+          aviso.Fecha += ':'+ await fechita.getMinutes();
+          aviso.Fecha += ' / '+ await fechita.getDay();
+          aviso.Fecha += '-'+ await fechita.getMonth();
+          aviso.Fecha += '-' + await fechita.getFullYear();
+        });
+
       },
     },
     methods:{

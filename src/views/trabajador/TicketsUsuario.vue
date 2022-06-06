@@ -1,8 +1,29 @@
 <template>
+<v-main>
   <v-container>
-    
-    <v-card>
-      <v-card class="black">{{recuperaTickets}}</v-card>
+    <v-card class="grey lighten-2">
+      <v-container>
+        <v-card>TICKETS DE INCIDENCIAS</v-card>
+      </v-container>
+
+      <v-container>
+        <v-card class="black">{{recuperaTickets}}
+        <v-row>
+        <v-col cols="5" md="8" >
+        </v-col>
+        <v-col cols="5" md="2" >
+        </v-col>
+        <v-col cols="5" md="1" >
+        </v-col>
+        <v-col cols="5" md="1" >
+          <v-btn small class="green" dark @click="dialog=true">+<v-icon>mdi-ticket</v-icon></v-btn> 
+        </v-col>
+        <v-col cols="5" md="1" >
+        </v-col>
+        </v-row>
+        </v-card>
+      </v-container>
+
       <v-container id="regular-tables-view" fluid tag="section">
         <view-intro heading="Simple Tables" link="components/simple-tables"/>
         <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
@@ -40,8 +61,6 @@
         <div class="py-3" />
       </v-container>
     </v-card>
-    
-    <v-btn color="primary" dark @click="dialog=true"> Nuevo ticket</v-btn>
 
    <v-row justify="center">
     <v-dialog
@@ -94,10 +113,27 @@
     </v-dialog>
   </v-row>
 
+  <!--DIÁLOGO MENSAJE DE ÉXITO-->
+      <v-dialog width="500" v-model="flagExitoCrearTicket">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-text>HECHO</v-text>
+              </v-card-title>
+              <v-card-text>
+                <v-text>Se creó el ticket con éxito</v-text>
+              </v-card-text>
+              <v-btn color="green darken-1" text @click="recargaPagina">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog>
+</v-container>
+
     <BarraLateral v-if = "rol==1"></BarraLateral>
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
-  </v-container>
+  
+  </v-main>
 </template>
 
 <script>
@@ -123,6 +159,7 @@
         fechas:[],
         tickets:[],
         error: '',
+        flagExitoCrearTicket:false,
       }
       },
     components:{
@@ -153,18 +190,40 @@
       }
     },
     methods:{
-      enviaTicket(){
+     async enviaTicket(){
         this.error='';
         const firebaseDB= getFirestore(firebaseApp);
         const auth = getAuth();
         if(this.descripcion && this.asunto){
-          //PRIMERO SE HARÁ LA PARTE DE ENVIAR EL TICKET
-
+         
 
           //UNA VEZ EL TICKET SE HA ENVIADO VAMOS A ALMACENARLO EN LA BASE DE DATOS
-          obtieneIdEmpresa(auth,firebaseDB,this.asunto,this.descripcion);
-          this.descripcion='';
-          this.asunto='';
+          var IdEmp;
+          const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
+          const querySnapshot = await getDocs(consulta);
+          querySnapshot.forEach(async (doc) => {
+          IdEmp=doc.get("IdEmpresa")
+
+          try {
+            console.log("El id empresa es "+IdEmp)
+            const docRef =  await addDoc(collection(firebaseDB, "Tickets"), {
+              Asunto: this.asunto,
+              Descripcion: this.descripcion,
+              Fecha: serverTimestamp(),
+              IdEmpleado: auth.currentUser.uid,
+              IdEmpresa: IdEmp,
+              Estado: "No resuelta"
+          });
+
+          this.flagExitoCrearTicket=true;
+          console.log("Document written with ID: ", docRef.id);
+
+          //SE ENVIA EL CORREO ELECTRÓNICO QUE SE HARÁ CON LAS FUNCTIONS DE FIREBASE
+          //enviaMail(1,this.correo,password);
+          } catch (e) {
+            console.error("Error adding document: ", e);
+          }
+          });
 
         }else{
           console.log("Hay campos vacíos");
@@ -173,39 +232,11 @@
       },
       cerrarDialogo(){
         this.dialog=false;
+      },
+      recargaPagina(){
+        location.reload();
       }
     }
   }
 
-  async function obtieneIdEmpresa(auth,firebaseDB,asunto,descripcion){
-    //Buscamos el nombre, apellidos, email y empresas
-    var IdEmp;
-    const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
-    const querySnapshot = await getDocs(consulta);
-      querySnapshot.forEach((doc) => {
-        IdEmp=doc.get("IdEmpresa")
-
-        almacenaEnBaseDeDatos(auth,firebaseDB,asunto,descripcion,IdEmp);
-      });
-  }
-
-  function almacenaEnBaseDeDatos(auth,firebaseDB,asunto,descripcion,IdEmp){
-    try {
-      console.log("El id empresa es "+IdEmp)
-      const docRef =  addDoc(collection(firebaseDB, "Tickets"), {
-        Asunto: asunto,
-        Descripcion: descripcion,
-        Fecha: serverTimestamp(),
-        IdEmpleado: auth.currentUser.uid,
-        IdEmpresa: IdEmp,
-        Estado: "No resuelta"
-      });
-      console.log("Document written with ID: ", docRef.id);
-
-      //SE ENVIA EL CORREO ELECTRÓNICO QUE SE HARÁ CON LAS FUNCTIONS DE FIREBASE
-      //enviaMail(1,this.correo,password);
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
-  }
 </script>

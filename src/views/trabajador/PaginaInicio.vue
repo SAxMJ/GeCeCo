@@ -1,17 +1,22 @@
 <template>
 <div>
      <v-main > 
-       <!-- {{probarMonitorizacion()}}-->
-        <!-- {{monitorizarPeriodico()}} -->
+       <v-container app>
        {{monitorizarPeriodico()}}
-      <v-container class="grey lighten-2">
+      <v-card class="grey lighten-2">
+
+      <v-container>
+        <v-card>INFORMACIÓN DE ESTE EQUIPO</v-card>
+      </v-container>
+
       <v-row rows="6" md="6">
-        <v-col cols="12" md="2">
+      
+      <v-col cols="12" md="2">
         <v-card></v-card>
-        </v-col>
+      </v-col>
     
-      <v-col cols="12" md="4">
-        <v-card width="400px" height="400px">
+      <v-col cols="12" md="3">
+        <v-card width="400px" height="425px">
           <v-container width="20" height="20">
             <v-card>CPU</v-card>
                 <v-progress-circular
@@ -24,8 +29,13 @@
           </v-container>
         </v-card>
       </v-col>
-       <v-col cols="12" md="4">
-       <v-card width="400px" height="400px">
+      
+      <v-col cols="12" md="2">
+        <v-card></v-card>
+      </v-col>
+
+       <v-col cols="12" md="3">
+       <v-card width="400px" height="425px">
           <v-container width="20" height="20">
             <v-card>RAM</v-card>
             <v-progress-circular
@@ -44,8 +54,12 @@
     </v-row>
 
     <v-row rows="6" md="6">
-       <v-col cols="12" md="4">
-        <v-card width="400px" height="400px">
+      <v-col cols="18" md="1">
+        <v-card></v-card>
+      </v-col>
+      
+       <v-col cols="18" md="3">
+        <v-card width="400px" height="425px">
           <v-container width="20" height="20">
             <v-card>Disco</v-card>
             <v-progress-circular
@@ -59,11 +73,13 @@
           </v-container>
         </v-card>
       </v-col>
-      <v-col cols="12" md="4">
-        <v-card width="400px" height="400px">
+        
+      <v-col cols="18" md="4">
+        <v-card width="550px" height="425px">
           <v-container width="20" height="20">
             <v-card>Info Sistema</v-card>
-              <v-card-title align-content-center>{{distro}}</v-card-title>
+              <v-card-text></v-card-text>
+              <v-card-title class="justify-center">{{distro}}</v-card-title>
               <v-card-text>{{platform}}</v-card-text>
               <v-card-text>{{arch}}</v-card-text>
               <v-card-text>{{hostname}}</v-card-text>
@@ -77,8 +93,9 @@
           </v-container>
         </v-card>
       </v-col>
-       <v-col cols="12" md="4">
-        <v-card width="400px" height="400px">
+       
+       <v-col cols="18" md="3">
+        <v-card width="400px" height="425px">
           <v-container width="20" height="20" >
             <v-card>Red</v-card>
              <v-progress-circular
@@ -91,9 +108,13 @@
           </v-container>
         </v-card>
       </v-col>
+        <v-col cols="18" md="1">
+        <v-card></v-card>
+      </v-col>
     </v-row>
-  </v-container>
-      </v-main>
+    </v-card>
+    </v-container>
+  </v-main>
 
     <BarraLateral v-if = "rol==1"></BarraLateral>
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
@@ -177,7 +198,7 @@
               const consulta2 = query(collection(firebaseDB,"Equipos/"+idEmpresaUsuario+"/Monitorizacion"),orderBy("Fecha","desc"),limit(1));
              
               const querySnapshot2=await getDocs(consulta2);
-               console.log("La idEmpresaUsuario: "+idEmpresaUsuario);
+              console.log("La idEmpresaUsuario: "+idEmpresaUsuario);
               querySnapshot2.forEach(async (doc2) => {
                 console.log(doc2)
                 

@@ -1,21 +1,29 @@
 <template>
 <v-main>
     <v-container app>
-    <v-card>SUPER USUARIOS</v-card>
+   
     <v-card class="grey lighten-2">
-    <v-container class="black">{{recuperaSuperUsuarios}}
-      <v-row justify="right">
-        <v-col cols="14" md="5" >
-        </v-col>
-        <v-col cols="14" md="5" >
-        </v-col>
-        <v-col cols="14" md="1" >
-            <v-btn class="green" @click="opcionBajaAlta(1)"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
-        </v-col>
-        <v-col cols="14" md="1" >
-          <v-btn class="red" @click="opcionBajaAlta(2)"><v-icon>mdi-account-minus-outline</v-icon></v-btn> 
-        </v-col>
-        </v-row>
+    <v-container>
+      <v-card>SUPER USUARIOS</v-card>
+    </v-container>
+
+    <v-container>
+      <v-card class="black">{{recuperaSuperUsuarios}}
+        <v-row justify="right">
+          <v-col cols="5" md="8" >
+          </v-col>
+          <v-col cols="5" md="2" >
+          </v-col>
+          <v-col cols="5" md="1" >
+              <v-btn small dark class="green" @click="opcionBajaAlta(1)"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
+          </v-col>
+          <v-col cols="5" md="1" >
+            <v-btn small dark class="red" @click="opcionBajaAlta(2)"><v-icon>mdi-account-minus-outline</v-icon></v-btn> 
+          </v-col>
+          <v-col cols="5" md="1" >
+          </v-col>
+          </v-row>
+      </v-card>
     </v-container>
     <v-container id="regular-tables-view" fluid tag="section">
         <v-data-table  v-model="usuariosSeleccionados" :headers="headerUsuarios" :items="superusuarios" :single-select="true" item-key="Correo"   show-select class="elevation-1">

@@ -1,23 +1,29 @@
 <template>
 <v-main>
   <v-container app>
-    <v-card>USUARIOS DE LA EMPRESA</v-card>
     <v-card class="grey lighten-2">
+      <v-container>
+        <v-card>USUARIOS DE LA EMPRESA</v-card>
+      </v-container>
+      <v-container>
       <v-card class="black">{{recuperaIDEmpresaAdmin}}
-        <v-row justify="right">
-        <v-col cols="12" md="3" >
-        </v-col>
-        <v-col cols="12" md="3" >
-        </v-col>
-        <v-col cols="12" md="3" >
-        </v-col>
-        <v-col cols="12" md="3" >
-          <router-link to="/registeradmin/2">
-            <v-btn class="green"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
-          </router-link>
-        </v-col>
+        <v-row>
+          <v-col cols="5" md="8" >
+          </v-col>
+          <v-col cols="5" md="2" >
+          </v-col>
+          <v-col cols="5" md="1" >
+          </v-col>
+          <v-col cols="5" md="1" >
+            <router-link to="/registeradmin/2">
+              <v-btn small dark class="green"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
+            </router-link>
+          </v-col>
+          <v-col cols="5" md="1" >
+          </v-col>
         </v-row>
       </v-card>
+      </v-container>
 
       <v-container id="regular-tables-view" fluid tag="section">
         <v-data-table  v-model="seleccionados" :headers="headers" :items="usuarios" :single-select="true" item-key="Correo" class="elevation-1">

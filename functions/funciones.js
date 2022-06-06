@@ -1,8 +1,19 @@
 const functions = require("firebase-functions");
 const admin=require('firebase-admin');
-admin.initializeApp();
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAZWJA8GkibUqjbRRMfFQ_OhYhjOV3NAQs",
+  authDomain: "gececo-c0865.firebaseapp.com",
+  projectId: "gececo-c0865",
+  storageBucket: "gececo-c0865.appspot.com",
+  messagingSenderId: "850837378930",
+  appId: "1:850837378930:web:8c6aa4e4bd92284a9d2feb"
+};
+
+const app=admin.initializeApp(firebaseConfig);
+
 const nodemailer = require("nodemailer");
-const { serverTimestamp } = require("firebase/firestore");
+const { collection, addDoc, getFirestore } = require("firebase/firestore");
 
 
 
@@ -113,7 +124,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             if(limite=="Supera"){
               if(snap.data().CPU.currentLoad > valor){
                console.log("SuperaCarga")
-               admin.firestore().collection("AvisosDeAlerta").doc("").set({
+               await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                  IdAdmin: idAdmin,
                  IdEquipo: IdEquipo,
                  Limite: limite,
@@ -128,7 +139,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             }
             else if(limite=="Menor"){
               if(snap.data().CPU.currentLoad < valor){
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -147,7 +158,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             if(limite=="Supera"){
               if(snap.data().CPU.currentLoadUser > valor){
                 console.log("SuperaCargaUsuarios")
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -162,7 +173,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             }
             else if(limite=="Menor"){
               if(snap.data().CPU.currentLoadUser < valor){
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -181,7 +192,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             if(limite=="Supera"){
               if(snap.data().CPU.currentLoadSystem > valor){
                 console.log("SuperaCargaUsuarios")
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -196,7 +207,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             }
             else if(limite=="Menor"){
               if(snap.data().CPU.currentLoadSystem < valor){
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -218,7 +229,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             if(limite=="Supera"){
               if(snap.data().DISK[0].use>valor){
                 console.log("Se supera el límite de disco ocupado")
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -242,7 +253,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
 
               if(porcDisp<valor){
                 console.log("El porentaje disponible es menor que el límite establecido ")
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -268,7 +279,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
 
               if(porcRamLibre<valor){
                 console.log("El porcentaje de la ram libre es menor que el tope")
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -291,7 +302,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
 
               if(porcRamUsada>valor){
                 console.log("El porcentaje de la ram usadaa es mayor que el tope")
-                admin.firestore().collection("AvisosDeAlerta").doc("").set({
+                await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
                   IdAdmin: idAdmin,
                   IdEquipo: IdEquipo,
                   Limite: limite,
@@ -306,17 +317,18 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
             }
           }
         }
-
+        
+        
         if(tipo=="PROCESOS"){
           if(snap.data().PROCESOS>valor){
-            console.log("Se ha superado el número de procesos")
-            admin.firestore().collection("AvisosDeAlerta").doc("").set({
+            console.log("Se ha superado el número de procesos: ")
+           await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
               IdAdmin: idAdmin,
               IdEquipo: IdEquipo,
               Tipo: tipo,
               ValorLimite: valor,
               ValorObtenido: snap.data().PROCESOS,
-              Fecha: serverTimestamp(),
+              Fecha: admin.firestore.FieldValue.serverTimestamp(),
               Estado: "No resuelta"
             })
           }

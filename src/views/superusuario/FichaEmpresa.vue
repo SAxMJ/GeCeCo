@@ -1,11 +1,25 @@
 <template>
+<v-main>
 <v-container>
-    <v-container> 
-        <v-card class="black">{{GetDatosEmpresa()}}</v-card>
+  <v-card class="grey lighten-2">
+     <v-container>
+        <v-card>FICHA DE LA EMPRESA</v-card>
+      </v-container>
+    <v-container>
+      
       <v-row justify="center">
+        
       <v-col cols="12" md="8">
+        <v-row>
+          <v-col cols="12" md="0">
+          </v-col>
+          <v-col cols="12" md="12">
+            <v-card class="black">{{GetDatosEmpresa()}}</v-card>
+          </v-col>
+      </v-row>
         <v-card icon="mdi-account-outline">  
           <v-card class="black"></v-card>
+          <v-container>
           <v-form>
             <v-container class="py-0">
               <v-row align-content-center>
@@ -52,6 +66,7 @@
               </v-row>
             </v-container>
           </v-form>
+          </v-container>
         </v-card>
       </v-col>
       </v-row>
@@ -128,9 +143,11 @@
       </template>
       </v-dialog> 
 
+    </v-card>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
 
-  </v-container>   
+  </v-container>
+  </v-main>   
 </template>
 
   <script>
