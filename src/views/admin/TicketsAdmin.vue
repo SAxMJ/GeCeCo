@@ -16,9 +16,10 @@
         <v-col cols="5" md="2" >
         </v-col>
         <v-col cols="5" md="1" >
+          <v-btn small dark class="green" @click="comprobarSeleccionados(0)"><v-icon>mdi-check</v-icon></v-btn>
         </v-col>
         <v-col cols="5" md="1" >
-          <v-btn small dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
+           <v-btn small dark class="red" @click="comprobarSeleccionados(1)"><v-icon>mdi-delete</v-icon></v-btn>
         </v-col>
         <v-col cols="5" md="1" >
         </v-col>
@@ -56,6 +57,21 @@
       </template>
       </v-dialog>
 
+       <v-dialog width="500" v-model="boolConfirmaBorrar">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-text>¿Estás seguro?</v-text>
+              </v-card-title>
+              <v-card-text>
+                <v-text>Se eliminarán el/los ticket(s) y no podrás recuperarlos</v-text>
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="boolConfirmaBorrar=false">CANCELAR</v-btn>
+              <v-btn color="green darken-1" text @click="borrarTicket">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog>
+
         <v-dialog width="500" v-model="boolExito">
         <template>
           <v-card>
@@ -80,7 +96,7 @@
 <script>
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
-  import {getFirestore, collection, updateDoc,doc} from "firebase/firestore"
+  import {getFirestore, collection, updateDoc,doc,deleteDoc} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
   import { getAuth } from "firebase/auth";
   import {query, where, getDocs} from "firebase/firestore";
@@ -102,6 +118,7 @@
           {text: 'Estado', value: "Estado"},
           {text: 'Hora / Fecha', value: "Fecha"}
         ],
+        boolConfirmaBorrar:false,
         boolConfirmacion:false,
         boolExito:false,
       }
@@ -142,7 +159,7 @@
           var fechita=await (ticket.Fecha).toDate()
           ticket.Fecha = ''+ await fechita.getHours();
           ticket.Fecha += ':'+ await fechita.getMinutes();
-          ticket.Fecha += ' / '+ await fechita.getDay();
+          ticket.Fecha += ' / '+ await fechita.getDate();
           ticket.Fecha += '-'+ await fechita.getMonth();
           ticket.Fecha += '-' + await fechita.getFullYear();
         });
@@ -159,15 +176,35 @@
           querySnapshot.forEach(async(doc) => {
             await updateDoc(doc.ref, {
             Estado:"Resuelta"
+            });
           });
-        });
         }
 
         this.boolExito=true;
       },
-      comprobarSeleccionados(){
-        if(this.seleccionados[0].Asunto){
+      async borrarTicket(){
+       
+        this.boolConfirmaBorrar=false;
+        const firebaseDB= getFirestore(firebaseApp);
+        
+        for(var seleccionado in this.seleccionados){
+        
+        const consulta =  query(collection(firebaseDB, "Tickets"), where("Asunto", "==", this.seleccionados[seleccionado].Asunto));
+        const querySnapshot = await getDocs(consulta);
+
+        querySnapshot.forEach(async(doc) => {
+          await deleteDoc(doc.ref)
+        });
+
+        this.boolExito=true;
+        }
+      },
+      comprobarSeleccionados(flag){
+        if(this.seleccionados[0].Asunto && flag==0){
           this.boolConfirmacion=true;
+        }
+        if(this.seleccionados[0].Asunto && flag==1){
+          this.boolConfirmaBorrar=true;
         }
       },
       recargarPagina(){

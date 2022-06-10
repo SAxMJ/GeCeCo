@@ -127,17 +127,12 @@
   import BarraLateral from '../../components/BarraLateralNormal.vue'
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
-  import { httpsCallable } from "firebase/functions";
-  import { getApp } from "firebase/app";
   import { getAuth } from "firebase/auth";
-  import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
-   import firebaseApp from '../../scripts/firebase'
-  import {getFirestore, updateDoc, query, getDocs, collection, where, getDoc, orderBy, limit} from "firebase/firestore"
+  import firebaseApp from '../../scripts/firebase'
+  import {getFirestore, query, getDocs, collection, where, getDoc, orderBy, limit} from "firebase/firestore"
   import Chart from 'chart.js/auto';
   
   
-  const functions = getFunctions(getApp());
-  connectFunctionsEmulator(functions, "localhost", 5001);
   const firebaseDB= getFirestore(firebaseApp);
 
   var rolUsr=1;

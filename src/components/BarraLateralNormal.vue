@@ -22,7 +22,7 @@
           </v-img>
         </v-list-item-avatar>
 
-        <v-list-item-title>NombreUsuario</v-list-item-title>
+        <v-list-item-title>TRABAJADOR</v-list-item-title>
         <v-btn
           icon
           @click.stop="mini = mini"

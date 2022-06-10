@@ -1,5 +1,10 @@
 const functions = require("firebase-functions");
-const admin=require('firebase-admin');
+const admin = require('firebase-admin');
+
+
+const cors = require('cors')({
+  origin: true
+});
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZWJA8GkibUqjbRRMfFQ_OhYhjOV3NAQs",
@@ -11,10 +16,6 @@ const firebaseConfig = {
 };
 
 const app=admin.initializeApp(firebaseConfig);
-
-const nodemailer = require("nodemailer");
-const { collection, addDoc, getFirestore } = require("firebase/firestore");
-
 
 
 //FUNCIÓN PARA REGISTRAR USUARIOS COMO ADMINISTRADOR
@@ -37,6 +38,7 @@ exports.registrarTrabajador=functions.https.onCall(async(data, context) => {
 
 //Email de restablecimiento de contraseña
 exports.mailEstablecerPassword=functions.https.onCall(async (data,context)=>{
+  cors(data,context,async ()=>{
   console.log("elmail: " +data.usuario);
 
   try{ //Se envía un mensaje de resauración de la contraseña al email
@@ -45,32 +47,36 @@ exports.mailEstablecerPassword=functions.https.onCall(async (data,context)=>{
   }catch(e){
     console.log("EL ERRORRrRrR: "+e)
   }
+  })
 });
-
-
 
 
 
 //Función para dar de baja un usuario, incluyendo eliminarlo de las bases de datos
  exports.darDeBajaUsuario=functions.https.onCall(async(data,context)=>{
-  console.log("EL USUARIO EMAIL "+data.correo)
-  var eluid
-  await admin.auth().getUserByEmail(data.correo).then(async(userRecord)=>{
-    console.log("Se recogió correctemente el usuario");
-    
-     await admin.auth().deleteUser(userRecord.uid).then(()=>{
-      console.log("Se eliminó correctemente el usuario");
-      eluid=userRecord.uid;
-      console.log("ElUIdEs1"+eluid);
-    }).catch((error)=>{
-      console.log("ERROR al eliminar el usuario: "+error);
+   
+   //cors(data,context,async ()=>{
 
+    console.log("EL USUARIO EMAIL "+data.correo)
+    var eluid
+    await admin.auth().getUserByEmail(data.correo).then(async(userRecord)=>{
+      console.log("Se recogió correctemente el usuario");
+      
+      await admin.auth().deleteUser(userRecord.uid).then(()=>{
+        console.log("Se eliminó correctemente el usuario");
+        eluid=userRecord.uid;
+        console.log("ElUIdEs1"+eluid);
+      }).catch((error)=>{
+        console.log("ERROR al eliminar el usuario: "+error);
+
+      });
+    }).catch((error)=>{
+        console.log("ERROR al tratar de obtener el usuario: "+error);
     });
-  }).catch((error)=>{
-      console.log("ERROR al tratar de obtener el usuario: "+error);
-  });
-  console.log("ElUIdEs2"+eluid);
-  return ""+eluid;
+    console.log("ElUIdEs2"+eluid);
+    
+    return ""+eluid;
+  //})
 });
 
 exports.modificaCorreoUsuario=functions.https.onCall(async(data,context)=>{
@@ -90,7 +96,8 @@ exports.modificaCorreoUsuario=functions.https.onCall(async(data,context)=>{
   }).catch((error)=>{
       console.log("ERROR al tratar de obtener el usuario: "+error);
   });
-  return newCorreo;
+  
+  return ""+newCorreo;
 })
 
 exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Monitorizacion/{idMonit}').onCreate(async (snap, context) => {
@@ -131,8 +138,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                  Tipo: tipo,
                  TipoElemento: tipoElemento,
                  ValorLimite: valor,
-                 ValorObtenido: snap.data().CPU.currentLoad,
-                 Fecha: serverTimestamp(),
+                 ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
+                 Fecha: admin.firestore.FieldValue.serverTimestamp(),
                  Estado: "No resuelta"
                })
               }
@@ -146,8 +153,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: snap.data().CPU.currentLoad,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -165,8 +172,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: snap.data().CPU.currentLoad,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -180,8 +187,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: snap.data().CPU.currentLoad,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -199,8 +206,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: snap.data().CPU.currentLoad,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -214,8 +221,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: snap.data().CPU.currentLoad,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -236,8 +243,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: snap.data().DISK[0].use,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (snap.data().DISK[0].use*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -260,8 +267,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: porcDisp,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (porcDisp*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -286,8 +293,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: porcRamLibre,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (porcRamLibre*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -309,8 +316,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   Tipo: tipo,
                   TipoElemento: tipoElemento,
                   ValorLimite: valor,
-                  ValorObtenido: porcRamUsada,
-                  Fecha: serverTimestamp(),
+                  ValorObtenido: (porcRamUsada*1).toFixed(2),
+                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
                   Estado: "No resuelta"
                 })
               }
@@ -343,7 +350,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
     console.log(idEmpresa);
     //console.log(IdUsuario);
 });
-
+/*
 function mailRestablecimiento(email,link){
 
   const config = require("./autenticadorMail");
@@ -372,3 +379,4 @@ function mailRestablecimiento(email,link){
         }
       });   
 };
+*/

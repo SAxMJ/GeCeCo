@@ -89,11 +89,6 @@ const routes = [
     component: () => import('../views/superusuario/RegisterEmpresa.vue')
   },
   {
-    path: '/usuariosempresa/:rol',
-    name: 'usuariosempresa',
-    component: () => import('../views/superusuario/UsuariosEmpresa.vue')
-  },
-  {
     path: '/superusuarios/:rol',
     name: 'superusuarios',
     component:() => import('../views/superusuario/SuperUsuarios.vue')

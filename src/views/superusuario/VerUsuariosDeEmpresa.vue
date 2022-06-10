@@ -201,14 +201,11 @@
   import firebaseApp from '../../scripts/firebase'
   import { getAuth,sendPasswordResetEmail } from "firebase/auth";
   import {query, where, getDocs} from "firebase/firestore";
-  import { getApp } from "firebase/app";
-  import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
+  import { getFunctions } from "firebase/functions"
   import { httpsCallable } from "firebase/functions";
-  import { getDownloadURL, getStorage, ref } from '@firebase/storage';
 
 //Esto es para poder llamar a las funciones del backend
-const functions = getFunctions(getApp());
-connectFunctionsEmulator(functions, "localhost", 5001);
+const functions = getFunctions(firebaseApp);
 
   export default{
     data (){

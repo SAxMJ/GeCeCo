@@ -88,11 +88,7 @@
   import { getAuth} from "firebase/auth";
   import {query, where, getDocs,addDoc} from "firebase/firestore";
   import { getApp } from "firebase/app";
-  import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
 
-//Esto es para poder llamar a las funciones del backend
-const functions = getFunctions(getApp());
-connectFunctionsEmulator(functions, "localhost", 5001);
 
   export default{
     data (){

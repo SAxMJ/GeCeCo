@@ -139,16 +139,13 @@
 import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
 import {getFirestore, collection, updateDoc,doc, deleteDoc, addDoc, where} from "firebase/firestore"
 import firebaseApp from '../../scripts/firebase'
-import { getAuth,sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { getAuth, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import {query, getDocs} from "firebase/firestore";
-import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
+import { getFunctions } from "firebase/functions"
 import { httpsCallable } from "firebase/functions";
-import { getDownloadURL, getStorage, ref } from '@firebase/storage';
-import { getApp } from "firebase/app";
 
 //Esto es para poder llamar a las funciones del backend
-const functions = getFunctions(getApp());
-connectFunctionsEmulator(functions, "localhost", 5001);
+const functions = getFunctions(firebaseApp);
 
 export default{
    data (){

@@ -52,8 +52,6 @@
    </v-container>
 </template>
 
-
-
 <script>
 
  import { getAuth, sendPasswordResetEmail,  } from "firebase/auth";

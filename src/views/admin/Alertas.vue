@@ -38,12 +38,30 @@
         <div class="py-3" />
       </v-container>
       
-      
+      <v-container>
+        <v-card class="black">
+        <v-row>
+        <v-col cols="20" md="8" >
+        </v-col>
+        <v-col cols="20" md="9" >
+        </v-col>
+        <v-col cols="20" md="2" >
+        </v-col>
+        <v-col cols="20" md="1" >
+          <v-btn small dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
+        </v-col>
+        <v-col cols="20" md="1" >
+        </v-col>
+        <v-col cols="20" md="1" >
+        </v-col>
+        </v-row>
+      </v-card>
+      </v-container>
         <v-container id="regular-tables-view" fluid tag="section">
           <v-card>AVISOS DE ALERTAS</v-card>
           <view-intro heading="Simple Tables" link="components/simple-tables"/>
           <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
-          <v-data-table  v-model="avisoSeleccionados" :headers="cabecerasAvisos" :items="avisos" :single-select="true" item-key="IdAlerta" show-select class="elevation-1">
+          <v-data-table  v-model="avisoSeleccionados" :headers="cabecerasAvisos" :items="avisos" :single-select="true" item-key="IdAviso" show-select class="elevation-1">
               <template v-slot:top>
               </template>
               </v-data-table>
@@ -199,6 +217,35 @@
             </v-card>
       </template>
       </v-dialog> 
+
+       <v-dialog width="500" v-model="boolConfirmacionAviso">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-text>¿Estás seguro que se atendió el aviso?</v-text>
+              </v-card-title>
+              <v-card-text>
+                <v-text>Se marcará el aviso como resuelto</v-text>
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="boolConfirmacion=false">CANCELAR</v-btn>
+              <v-btn color="green darken-1" text @click="marcarAvisoResuelto">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog>
+
+      <v-dialog width="500" v-model="boolExito">
+        <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-text>HECHO</v-text>
+              </v-card-title>
+              <v-card-text>
+                <v-text>Se actualizó el estado del aviso</v-text>
+              </v-card-text>
+              <v-btn color="green darken-1" text @click="recargaPagina">ACEPTAR</v-btn>
+          </v-card>
+        </template>
+        </v-dialog> 
       
   </v-row>
 
@@ -213,7 +260,7 @@
   
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
-  import {getFirestore, collection, addDoc, updateDoc, deleteDoc, orderBy} from "firebase/firestore"
+  import {getFirestore, collection, addDoc, updateDoc, deleteDoc, orderBy, doc} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
   import { getAuth } from "firebase/auth";
   import {query, where, getDocs, serverTimestamp  } from "firebase/firestore";
@@ -224,6 +271,8 @@
   export default{
     data (){
       return{
+        errors:"",
+        boolConfirmacionAviso:false,
         boolNuevaAlerta: false,
         boolConfirmacionBorrarAlerta:false,
         boolConfirmacionModificarAlerta:false,
@@ -254,6 +303,7 @@
           {text: 'Descripcion', value: "Descripcion"},
           {text: 'Limite', value: "Limite"},
           {text: 'Valor', value: "Valor"},
+          {value: "IdAviso"}
         ],
         cabecerasAvisos:[
           {text: 'IdEquipo',value: "IdEquipo"},
@@ -314,19 +364,24 @@
 
         const avisosRef = collection(firebaseDB, 'AvisosDeAlerta');
         console.log(auth.currentUser.uid)
-        const consulta2 =  query(avisosRef, where("IdAdmin", "==", auth.currentUser.uid), orderBy("Fecha","asc"));
+        const consulta2 =  query(avisosRef, where("IdAdmin", "==", auth.currentUser.uid), orderBy("Fecha","desc"));
         const querySnapshot2 = await getDocs(consulta2);
         
+        var i=0;
         querySnapshot2.forEach((doc) => {
           this.avisos.push(doc.data());
+          this.avisos[i].IdAviso=doc.id;
+          i++;
         });
+
+        console.log(this.avisos[0].IdAviso);
 
         //Casteamos la fecha de cada ticket para darle un formato en el que mostrarlo
         this.avisos.forEach(async function(aviso){
           var fechita=await (aviso.Fecha).toDate()
           aviso.Fecha = ''+ await fechita.getHours();
           aviso.Fecha += ':'+ await fechita.getMinutes();
-          aviso.Fecha += ' / '+ await fechita.getDay();
+          aviso.Fecha += ' / '+ await fechita.getDate();
           aviso.Fecha += '-'+ await fechita.getMonth();
           aviso.Fecha += '-' + await fechita.getFullYear();
         });
@@ -448,6 +503,25 @@
       },
       recargaPagina(){
          location.reload();
+      },
+      comprobarSeleccionados(){
+        if(this.avisoSeleccionados[0].IdAviso){
+          this.boolConfirmacionAviso=true;
+        }
+      },
+      async marcarAvisoResuelto(){
+
+        const firebaseDB= getFirestore(firebaseApp);
+        
+          var docRef=doc(firebaseDB, "AvisosDeAlerta", this.avisoSeleccionados[0].IdAviso)
+          //querySnapshot.forEach(async(doc) => {
+            await updateDoc(docRef, {
+              Estado:"Atendido"
+          });
+        //});
+
+        this.boolConfirmacionAviso=false;
+        this.boolExito=true;
       }
     }
   }

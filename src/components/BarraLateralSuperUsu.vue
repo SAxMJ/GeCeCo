@@ -22,7 +22,7 @@
           </v-img>
         </v-list-item-avatar>
 
-        <v-list-item-title>{{nombreusuario}}</v-list-item-title>
+        <v-list-item-title>SUPER USUARIO</v-list-item-title>
         <v-btn
           icon
           @click.stop="mini = mini"

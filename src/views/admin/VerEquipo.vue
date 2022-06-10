@@ -58,6 +58,27 @@
                 </template>
             </v-card>
             </v-col>
+            <v-col cols="12" md="5">
+            <v-card>
+                <template>
+                    <v-treeview :items="itemsUSB">USB</v-treeview>
+                </template>
+            </v-card>
+            </v-col>
+            <v-col cols="12" md="2">
+            <v-card>
+                <template>
+                    <v-treeview :items="itemsBATERIA">BATERÍA</v-treeview>
+                </template>
+            </v-card>
+            </v-col>
+            <v-col cols="12" md="5">
+            <v-card>
+                <template>
+                    <v-treeview :items="itemsRED">USB</v-treeview>
+                </template>
+            </v-card>
+            </v-col>
         </v-row>
 
         <v-row rows="12" md="4">
@@ -138,14 +159,8 @@
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
   import {getFirestore, collection, updateDoc,doc, deleteDoc, orderBy, limit} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
-  import { getAuth} from "firebase/auth";
   import {query, where, getDocs,addDoc} from "firebase/firestore";
-  import { getApp } from "firebase/app";
-  import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
-
-//Esto es para poder llamar a las funciones del backend
-    const functions = getFunctions(getApp());
-    connectFunctionsEmulator(functions, "localhost", 5001);
+   
     const firebaseDB= getFirestore(firebaseApp);
 
   export default{
@@ -205,6 +220,24 @@
             children:[]
         }],
 
+        itemsUSB:[{
+            id: 1,
+            name: 'DISPOSITIVOS',
+            children:[],
+        }],
+
+        itemsRED:[{
+            id: 1,
+            name: 'RED',
+            children:[],
+        }],
+
+         itemsBATERIA:[{
+            id: 1,
+            name: 'BATERÍA',
+            children:[],
+        }],
+
         platform:"",
         distro:"",
         arch:"",
@@ -225,25 +258,68 @@
             const consulta2 = query(collection(firebaseDB,"Equipos/"+this.idEquipo+"/Monitorizacion"),orderBy("Fecha","desc"),limit(1));
             const querySnapshot2=await getDocs(consulta2);
             querySnapshot2.forEach(async (infoMonit) => { 
-                console.log("ForEachEstoy")
+
                 this.itemsCPU[0].children.push({id:2, name:"Carga (%): "+(infoMonit.get("CPU").currentLoad*1).toFixed(2)})
                 this.itemsCPU[0].children.push({id:3, name:"Carga Usuario (%): "+(infoMonit.get("CPU").currentLoadUser*1).toFixed(2)})
                 this.itemsCPU[0].children.push({id:4, name:"Carga Sistema (%): "+(infoMonit.get("CPU").currentLoadSystem*1).toFixed(2)})
                 this.itemsCPU[0].children.push({id:5, name:"Carga Reposo (%): "+(infoMonit.get("CPU").currentLoadIdle*1).toFixed(2)})
                 this.itemsCPU[0].children.push({id:6, name:"Carga media: "+(infoMonit.get("CPU").avgLoad*1).toFixed(2)})
                 
-                console.log("Si")
                 this.itemsRAM[0].children.push({id:2, name:"Total (GB): "+(infoMonit.get("RAM").total* (9.53*Math.pow(10, -10))).toFixed(2)})
                 this.itemsRAM[0].children.push({id:3, name:"Libre (GB): "+(infoMonit.get("RAM").free* (9.53*Math.pow(10, -10))).toFixed(2)})
-                this.itemsRAM[0].children.push({id:4, name:"Usaa (GB): "+(infoMonit.get("RAM").used* (9.53*Math.pow(10, -10))).toFixed(2)})
+                this.itemsRAM[0].children.push({id:4, name:"Usada (GB): "+(infoMonit.get("RAM").used* (9.53*Math.pow(10, -10))).toFixed(2)})
                 this.itemsRAM[0].children.push({id:5, name:"Activa (GB): "+(infoMonit.get("RAM").active* (9.53*Math.pow(10, -10))).toFixed(2)})
                 this.itemsRAM[0].children.push({id:6, name:"Disponible (GB): "+(infoMonit.get("RAM").available* (9.53*Math.pow(10, -10))).toFixed(2)})
 
-                console.log("sisi")
                 this.itemsDISK[0].children.push({id:2, name:"Tamaño (GB): "+(infoMonit.get("DISK")[0].size * (9.31*Math.pow(10, -10))).toFixed(2)})
                 this.itemsDISK[0].children.push({id:3, name:"Usado (GB): "+(infoMonit.get("DISK")[0].used * (9.31*Math.pow(10, -10))).toFixed(2)})
                 this.itemsDISK[0].children.push({id:4, name:"Disponible (GB): "+((infoMonit.get("DISK")[0].size - infoMonit.get("DISK")[0].used) * (9.31*Math.pow(10, -10))).toFixed(2)})
                 this.itemsDISK[0].children.push({id:5, name:"Usado (%): "+((infoMonit.get("DISK")[0].use*1)).toFixed(2)});
+
+                var dispConectados=infoMonit.get("USB")
+                var i=0;
+                var j=2;
+
+                for(var seleccionado in dispConectados){
+                    
+                    this.itemsUSB[0].children.push({id: j, name: 'USB '+i, children:[],})
+
+                    this.itemsUSB[0].children[i].children.push({id:j, name:"ID: "+ dispConectados[seleccionado].id})
+                    j++;
+                    this.itemsUSB[0].children[i].children.push({id:j, name:"Nombre: "+ dispConectados[seleccionado].name})
+                    j++
+                    this.itemsUSB[0].children[i].children.push({id:j, name:"Tipo: "+ dispConectados[seleccionado].type})
+                    j++
+                    i++ 
+                }
+
+                var dispositivosDeRed=infoMonit.get("CONNEXION")
+                i=0;
+                j=2;
+                console.log(dispConectados)
+                for(var seleccionado in dispositivosDeRed){
+                    
+                    this.itemsRED[0].children.push({id: j, name: 'Interfaz '+i, children:[],})
+
+                    this.itemsRED[0].children[i].children.push({id:j, name:"Tipo interfaz: "+ dispositivosDeRed[seleccionado].iface})
+                    j++;
+                    this.itemsRED[0].children[i].children.push({id:j, name:"Estado: "+ dispositivosDeRed[seleccionado].operstate})
+                    j++
+                    this.itemsRED[0].children[i].children.push({id:j, name:"Bytes recibidos: "+ dispositivosDeRed[seleccionado].rx_bytes})
+                    j++
+                    this.itemsRED[0].children[i].children.push({id:j, name:"Errores recibidos: "+ dispositivosDeRed[seleccionado].rx_errors})
+                    j++
+                    i++ 
+                }
+
+                this.itemsBATERIA[0].children.push({id:2, name:"Batería: "+(infoMonit.get("BATTERY").hasBattery)})
+                this.itemsBATERIA[0].children.push({id:3, name:"En carga: "+(infoMonit.get("BATTERY").isCharging)})
+                this.itemsBATERIA[0].children.push({id:4, name:"Cap Desig: "+(infoMonit.get("BATTERY").designedCapacity)})
+                this.itemsBATERIA[0].children.push({id:5, name:"Cap Max: "+(infoMonit.get("BATTERY").maxCapacity)})
+                this.itemsBATERIA[0].children.push({id:6, name:"Cap Act: "+(infoMonit.get("BATTERY").currentCapacity)})
+                this.itemsBATERIA[0].children.push({id:7, name:"Voltaje: "+(infoMonit.get("BATTERY").voltage)})
+                this.itemsBATERIA[0].children.push({id:8, name:"Carga(%): "+(infoMonit.get("BATTERY").percent)})
+
 
                 this.distro=infoMonit.get("OSINFO").distro;
                 this.platform="Plataforma: "+infoMonit.get("OSINFO").platform;
@@ -258,7 +334,7 @@
 
             const avisosRef = collection(firebaseDB, 'AvisosDeAlerta');
 
-            const consulta =  query(avisosRef, where("IdEquipo", "==", this.idEquipo), orderBy("Fecha","asc"));
+            const consulta =  query(avisosRef, where("IdEquipo", "==", this.idEquipo), orderBy("Fecha","desc"));
             const querySnapshot = await getDocs(consulta);
             
             querySnapshot.forEach((doc) => {
@@ -270,7 +346,7 @@
             var fechita=await (aviso.Fecha).toDate()
             aviso.Fecha = ''+ await fechita.getHours();
             aviso.Fecha += ':'+ await fechita.getMinutes();
-            aviso.Fecha += ' / '+ await fechita.getDay();
+            aviso.Fecha += ' / '+ await fechita.getDate();
             aviso.Fecha += '-'+ await fechita.getMonth();
             aviso.Fecha += '-' + await fechita.getFullYear();
             });
@@ -302,8 +378,8 @@
             var fechita=await (historicoMonito.Fecha).toDate()
             historicoMonito.Fecha = ''+ await fechita.getHours();
             historicoMonito.Fecha += ':'+ await fechita.getMinutes();
-            historicoMonito.Fecha += ' / '+ await fechita.getDay();
-            historicoMonito.Fecha += '-'+ await fechita.getMonth();
+            historicoMonito.Fecha += ' / '+ await fechita.getDate();
+            historicoMonito.Fecha += '-'+ await fechita.getUTCMonth();
             historicoMonito.Fecha += '-' + await fechita.getFullYear();
             });
        }

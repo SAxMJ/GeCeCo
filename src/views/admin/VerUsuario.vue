@@ -1,8 +1,10 @@
 <template>
-<v-container > 
-    <v-card>
-      <v-row justify="center">
-      <v-col cols="12" md="8">
+<v-main>
+<v-container app>
+<v-card>
+<v-container class="grey lighten-2">
+  <v-card>FICHA DE USUARIO</v-card>
+    <v-container id="user-profile-view" fluid tag="section">
         <v-card icon="mdi-account-outline">
           <v-card class="black">{{GetDatosUsuario}}</v-card>
           <v-form>
@@ -17,7 +19,7 @@
                 </v-col>
 
                 <v-col cols="12" md="4">
-                  <v-img class="rounded-circle elevation-6 mt-n1 d-inline-block" :src="imgurl"></v-img>
+                  <v-img class="rounded-circle elevation-6 mt-n1 d-inline-block" :src="imgurl" width="128"></v-img>
                   <v-menu offset-y>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn icon color="black" dark v-bind="attrs" v-on="on"><v-icon dark>mdi-cog</v-icon></v-btn>
@@ -35,7 +37,7 @@
                 </v-col>
 
                 <v-col cols="12" md="6">
-                  <v-text-field color="black" label="Email" v-model= "email" :readonly=false />
+                  <v-text-field color="black" label="Email" v-model= "email" readonly=false />
                 </v-col>
 
                 <v-col cols="12" md="6">
@@ -52,8 +54,7 @@
             </v-container>
           </v-form>
         </v-card>
-      </v-col>
-      </v-row>
+
 
     <!--DIÁLOGO DE CONFIRMACIÓN DE RESTABLECIMIENTO DE CONTRASEÑA-->
       <v-dialog width="500" v-model="flagmodificapass">
@@ -164,12 +165,14 @@
           </v-card>
       </template>
       </v-dialog> 
-
-    </v-card>
-
+      </v-container>
         <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
         <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
+        
       </v-container>
+      </v-card>
+      </v-container>
+      </v-main>
 </template>
 
 <script>
@@ -180,15 +183,13 @@
   import firebaseApp from '../../scripts/firebase'
   import { getAuth,sendPasswordResetEmail } from "firebase/auth";
   import {query, where, getDocs} from "firebase/firestore";
-  import { getApp } from "firebase/app";
-  import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
+  import { getFunctions } from "firebase/functions"
   import { httpsCallable } from "firebase/functions";
 
   var rolUsr=1;
   console.log("Es--> " +rolUsr);
   
-  const functions = getFunctions(getApp());
-  connectFunctionsEmulator(functions, "localhost", 5001);
+  const functions = getFunctions(firebaseApp);
 
   export default{
     data (){
@@ -315,6 +316,8 @@
       },
       async darDeBajaUsuario(){
         const firebaseDB= getFirestore(firebaseApp);
+        //const darDeBajaUsuario=httpsCallable(functions,"darDeBajaUsuario");
+        //darDeBajaUsuario({correo: this.email}).then(async(result) => {
         const darDeBajaUsuario=httpsCallable(functions,"darDeBajaUsuario");
           darDeBajaUsuario({correo: this.email}).then(async(result) => {
             console.log(result.data);
@@ -335,6 +338,8 @@
             }); 
             this.flagbajausuario=false;
             this.flagexito=true;
+        }).catch((error)=>{
+            console.log("ERROR al eliminar usuario "+this.email+": "+error);
         });
       }, 
       recargarPagina(){

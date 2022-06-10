@@ -24,50 +24,17 @@
         </v-card>
       </v-container>
 
-      <v-container id="regular-tables-view" fluid tag="section">
-        <view-intro heading="Simple Tables" link="components/simple-tables"/>
-        <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
-          <v-simple-table>
-            <thead> <!--ESTA ESTA LA CABECERA DE LA TABLA-->
-              <tr>
-                <th class="text-left">
-                  Asunto
-                </th>
-                <th class="text-left">
-                  Descripción
-                </th>
-                <th class="text-left">
-                  Estado
-                </th>
-                 <th class="text-left">
-                  Fecha
-                </th>
-              </tr>
-            </thead>
-
-            <tbody> <!--ESTE ES EL CUERPO DE LA TABLA-->
-            <tr
-            v-for="ticket in tickets"
-            :key="ticket.name"
-            >
-          <td class="text-left">{{ ticket.Asunto }}</td>
-          <td class="text-left">{{ ticket.Descripcion }}</td>
-          <td class="text-left">{{ ticket.Estado }}</td>
-          <td class="text-left">{{ ticket.Fecha }}</td>
-          </tr>
-      </tbody>
-          </v-simple-table>
-        </material-card>
-        <div class="py-3" />
+       <v-container>
+      <v-data-table :headers="headers" :items="tickets" :single-select="true" item-key="Asunto"  class="elevation-1">
+      <template v-slot:item.actions="{ item }">
+          <v-icon medium class="mr-2" @click="modificarTicket(item)">mdi-pencil</v-icon>
+        </template>
+      </v-data-table>
       </v-container>
     </v-card>
 
    <v-row justify="center">
-    <v-dialog
-      v-model="dialog"
-      persistent
-      max-width="600px"
-    >
+    <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title class="justify-center">
           <span class="text-h5" >Nuevo ticket</span>
@@ -94,20 +61,41 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="red darken-1"
-            text
-            @click="cerrarDialogo"
-          >
-            Cerrar
-          </v-btn>
-          <v-btn
-            color="green darken-1"
-            text
-            @click="enviaTicket"
-          >
-            Enviar
-          </v-btn>
+          <v-btn color="red darken-1" text @click="cerrarDialogo">Cerrar</v-btn>
+          <v-btn color="green darken-1" text @click="enviaTicket">Enviar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="boolEditarTicket" persistent max-width="600px">
+      <v-card>
+        <v-card-title class="justify-center">
+          <span class="text-h5">Modificar ticket</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field v-model="asuntoEditar" label="Asunto" outlined required></v-text-field>
+              </v-col>
+              </v-row>
+              <v-row>
+                <v-textarea v-model="descripcionEditar" label="Descripción de la incidencia" counter maxlength="300" full-width single-line 
+                outlined required>
+                </v-textarea>
+            </v-row>
+          </v-container>
+          <small>* Indica campo requerido</small>
+        </v-card-text>
+        <v-card-text>
+          <v-alert dense outlined type="error" v-if="error">
+            {{error}}
+          </v-alert>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" text @click="boolEditarTicket=false">Cerrar</v-btn>
+          <v-btn color="green darken-1" text @click="actualizarTicket">Actualizar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -121,7 +109,7 @@
                 <v-text>HECHO</v-text>
               </v-card-title>
               <v-card-text>
-                <v-text>Se creó el ticket con éxito</v-text>
+                <v-text>Se realizó con éxito</v-text>
               </v-card-text>
               <v-btn color="green darken-1" text @click="recargaPagina">ACEPTAR</v-btn>
           </v-card>
@@ -141,7 +129,7 @@
   import BarraLateral from '../../components/BarraLateralNormal.vue'
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
-  import {getFirestore, collection, addDoc} from "firebase/firestore"
+  import {getFirestore, collection, addDoc, updateDoc} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
   import { getAuth } from "firebase/auth";
   import {query, where, getDocs, serverTimestamp  } from "firebase/firestore";
@@ -152,6 +140,10 @@
   export default{
     data (){
       return{
+        asuntoEditar:"",
+        descripcionEditar:"",
+        asuntoAnterior:"",
+        boolEditarTicket:false,
         dialog: false,
         rol: this.$route.params.rol,
         asunto:'',
@@ -160,6 +152,13 @@
         tickets:[],
         error: '',
         flagExitoCrearTicket:false,
+        headers:[
+          {text: 'Asunto',value: "Asunto"},
+          {text: 'Descripción', value: "Descripcion"},
+          {text: 'Estado', value: "Estado"},
+          {text: 'Hora / Fecha', value: "Fecha"},
+          {text: 'Modificar', value: "actions"}
+        ]
       }
       },
     components:{
@@ -183,7 +182,7 @@
           var fechita=await (ticket.Fecha).toDate()
           ticket.Fecha = ''+ await fechita.getHours();
           ticket.Fecha += ':'+ await fechita.getMinutes();
-          ticket.Fecha += ' / '+ await fechita.getDay();
+          ticket.Fecha += ' / '+ await fechita.getDate();
           ticket.Fecha += '-'+ await fechita.getMonth();
           ticket.Fecha += '-' + await fechita.getFullYear();
         });
@@ -195,8 +194,6 @@
         const firebaseDB= getFirestore(firebaseApp);
         const auth = getAuth();
         if(this.descripcion && this.asunto){
-         
-
           //UNA VEZ EL TICKET SE HA ENVIADO VAMOS A ALMACENARLO EN LA BASE DE DATOS
           var IdEmp;
           const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
@@ -229,6 +226,37 @@
           console.log("Hay campos vacíos");
           this.error="Hay campos vacíos";
         }
+      },
+      async actualizarTicket(){
+        this.error='';
+        const firebaseDB= getFirestore(firebaseApp);
+
+        if(this.descripcionEditar && this.asuntoEditar){
+         
+          const consulta =  query(collection(firebaseDB, "Tickets"), where("Asunto", "==", this.asuntoAnterior));
+          const querySnapshot = await getDocs(consulta);
+          querySnapshot.forEach(async(doc) => {
+            await updateDoc(doc.ref, {
+            Estado:"No resuelta",
+            Asunto: this.asuntoEditar,
+            Descripcion: this.descripcionEditar,
+            Fecha: serverTimestamp(),
+            });
+          });
+
+        }else{
+          console.log("Hay campos vacíos");
+          this.error="Hay campos vacíos";
+        }
+
+        this.boolEditarTicket=false;
+        this.flagExitoCrearTicket=true;
+      },
+      modificarTicket(item){
+        this.asuntoEditar=item.Asunto;
+        this.descripcionEditar=item.Descripcion;
+        this.asuntoAnterior=item.Asunto;
+        this.boolEditarTicket=true;
       },
       cerrarDialogo(){
         this.dialog=false;

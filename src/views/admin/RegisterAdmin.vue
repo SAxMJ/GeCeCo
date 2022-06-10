@@ -58,16 +58,13 @@ import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
 import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail} from "firebase/auth";
 import {getFirestore, collection, addDoc} from "firebase/firestore"
 import firebaseApp from '../../scripts/firebase';
-//import  {enviaMail} from '../../functions/mails';
 import {query, where, getDocs, onSnapshot  } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 import { getApp } from "firebase/app";
-import { getFunctions, connectFunctionsEmulator } from "firebase/functions"
+import { getFunctions } from "firebase/functions"
 import { getDownloadURL, getStorage, ref } from '@firebase/storage';
 
-
-const functions = getFunctions(getApp());
-connectFunctionsEmulator(functions, "localhost", 5001);
+const functions = getFunctions(firebaseApp);
 
 export default({
    data(){
