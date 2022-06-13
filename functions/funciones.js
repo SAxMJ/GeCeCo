@@ -19,6 +19,10 @@ const app=admin.initializeApp(firebaseConfig);
 
 
 //FUNCIÓN PARA REGISTRAR USUARIOS COMO ADMINISTRADOR
+/**Cloud Function para registrar usuarios en el sistema como administrador 
+ * @param {any} data - data.usuario Contendrá el email del usuario a registrar
+ * @param {any} data - data.pass Contendrá la contraseña del usuario a registrar
+*/
 exports.registrarTrabajador=functions.https.onCall(async(data, context) => {
   
   var elUID;
@@ -37,6 +41,9 @@ exports.registrarTrabajador=functions.https.onCall(async(data, context) => {
 
 
 //Email de restablecimiento de contraseña
+/**Cloud Function para enviar un email de restablecimiento de contraseña como administrador 
+ * @param {any} data - data.usuario Contendrá el email del usuario a restablecer la contraseña
+*/
 exports.mailEstablecerPassword=functions.https.onCall(async (data,context)=>{
   cors(data,context,async ()=>{
   console.log("elmail: " +data.usuario);
@@ -53,6 +60,9 @@ exports.mailEstablecerPassword=functions.https.onCall(async (data,context)=>{
 
 
 //Función para dar de baja un usuario, incluyendo eliminarlo de las bases de datos
+/**Cloud Function para dar de baja un usuario como administrador 
+ * @param {any} data - data.correo Contendrá el email del usuario al que dar de baja
+*/
  exports.darDeBajaUsuario=functions.https.onCall(async(data,context)=>{
    
    //cors(data,context,async ()=>{
@@ -79,6 +89,10 @@ exports.mailEstablecerPassword=functions.https.onCall(async (data,context)=>{
   //})
 });
 
+/**Cloud Function para modificar el email de un usuario dentro del sistema como administrador 
+ * @param {any} data - data.correo1 Contendrá el email antiguo del usuario al que se va a modifiar el email
+ * @param {any} data - data.correo2 Contendrá el nuevo email del usuario al que se va a modificar el email
+*/
 exports.modificaCorreoUsuario=functions.https.onCall(async(data,context)=>{
   
   var newCorreo;
@@ -100,6 +114,10 @@ exports.modificaCorreoUsuario=functions.https.onCall(async(data,context)=>{
   return ""+newCorreo;
 })
 
+/**Cloud Function que funciona como un disparador cuando un se añade una nueva monitorización a la base de datos, comprobará la información
+ * almacenada y la comprobará con las alertas creadas correspondientes por si tuviese que generar un aviso
+ * @param {QueryDocumentSnapshot} snap - Contiene toda la información recientemente almacenada en la base de datos correspondiente
+ */
 exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Monitorizacion/{idMonit}').onCreate(async (snap, context) => {
     
     var rutaArchivo=snap.ref.path.split("/");

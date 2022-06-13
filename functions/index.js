@@ -1,6 +1,6 @@
 
 
-
+/** Especifiacación de la configuración del proyecto de Firebase */
   const firebaseConfig = {
     apiKey: "AIzaSyAZWJA8GkibUqjbRRMfFQ_OhYhjOV3NAQs",
     authDomain: "gececo-c0865.firebaseapp.com",
