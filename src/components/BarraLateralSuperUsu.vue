@@ -1,5 +1,11 @@
 <template>
       <v-navigation-drawer app  :mini-variant.sync="mini" permanent class="secondary">
+        <v-card class="transparent">
+            <v-card-title class="justify-center" >
+              <v-img width="100" class="justify-center" src="../images/LogoTrasparente2.png">
+              </v-img>
+           </v-card-title>
+        </v-card>
         <v-list-item class="px-2" dark>
         <v-list-item-avatar>
           <v-img :src="fotourl">
@@ -23,13 +29,7 @@
         </v-list-item-avatar>
 
         <v-list-item-title>SUPER USUARIO</v-list-item-title>
-        <v-btn
-          icon
-          @click.stop="mini = mini"
-        >
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
-      </v-list-item>
+        </v-list-item>
 
       <v-divider></v-divider>
       <v-list  dark>
@@ -48,7 +48,22 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      {{getUrlFotoPerfil}}
+
+      <v-menu offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon dark v-on="on" ><v-icon dark>mdi-key-remove</v-icon>Cerrar sesión</v-btn>
+          </template>
+          <v-list dark>
+            <v-list-item
+              v-for="(opciones, index) in opciones"
+              :key="index"
+              @click="cerrarSesion"
+            >
+              <v-list-item-title>{{ opciones.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
       </v-navigation-drawer>
 </template>
 
@@ -78,6 +93,10 @@ import firebaseApp from '../scripts/firebase'
         ]
       }
     },methods:{
+       
+        /** Método encargado de borrar la sesión creada
+         * @public
+         */
         cerrarSesion(){
           const auth = getAuth();
           signOut(auth).then(() => {
@@ -85,10 +104,13 @@ import firebaseApp from '../scripts/firebase'
           }).catch((error) => {
             console.log("Error, no se cerró sesíon: "+error)
           });
-        }
-      },
-      computed:{
-          async getUrlFotoPerfil(){ //Método para obtener la url de la foto de perfil
+        },
+        
+        /** Método encargado de recuperar la URL de la foto de perfil del usuario correspondiente para que pueda ser mostrada
+       * en la barra lateral
+       * @public
+       */
+        async getUrlFotoPerfil(){ //Método para obtener la url de la foto de perfil
             const firebaseDB= getFirestore(firebaseApp);
 
             var photo;
@@ -120,6 +142,9 @@ import firebaseApp from '../scripts/firebase'
               console.log("Nombre "+ this.nombreusuario)
             });
         }
+      },
+      mounted(){
+        this.getUrlFotoPerfil();
       }
   }
 </script>

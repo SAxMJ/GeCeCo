@@ -1,15 +1,9 @@
 <template>
 <v-main>
-  <v-container>
+  <v-container app>
     <v-card  class="grey lighten-2">
-      
       <v-container>
-        <v-card>TICKETS DE LA EMPRESA</v-card>
-      </v-container>
-      
-      <v-container>
-      <v-container id="regular-tables-view" fluid tag="section">
-      <v-card class="black">{{recuperaTicketsTrabajadores}}
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
         <v-row>
         <v-col cols="5" md="8" >
         </v-col>
@@ -24,10 +18,9 @@
         <v-col cols="5" md="1" >
         </v-col>
         </v-row>
-      </v-card>
-      </v-container>
+        </v-img>
       
-      <v-container>
+      <v-card>TICKETS DE LA EMPRESA</v-card>
       <v-data-table v-model="seleccionados" :headers="headers" :items="tickets" :single-select="singleSelect" item-key="Asunto" show-select class="elevation-1">
       <template v-slot:top>
         <v-switch
@@ -37,8 +30,7 @@
         ></v-switch>
       </template>
       </v-data-table>
-      </v-container>
-    <div class="py-3" />
+
     </v-container>
     </v-card>
     
@@ -103,6 +95,12 @@
 
   var rolUsr=1;
   console.log("Es--> " +rolUsr);
+
+/** Ventana donde se muestran los tickets creados por los usuarios normales de la empresa a la
+ * que está asociada el administrador. Podrá tanto eliminar como marcar los tickets como resueltos
+* @public
+*/
+
   
   export default{
     data (){
@@ -127,25 +125,15 @@
       BarraLateralAdmin,
       BarraLateralSuperUsu
     },
-   computed:{ //Cada vez que inicializamos la paginarecogemos los datos
-      //Para el administrador los tickets recuperados serán todos aquellos que coincidan con su código de empresa 
-      async recuperaTicketsTrabajadores(){
-      //Buscamos IdEmpresa de este administrador
-      const firebaseDB= getFirestore(firebaseApp);
-      const auth = getAuth();
-      const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
-      const querySnapshot = await getDocs(consulta);
-        querySnapshot.forEach((doc) => {
-          var IdEmp=doc.get("IdEmpresa")
-          console.log("la ID EMPRESA ES "+IdEmp);
-          this.recuperaTickets(firebaseDB,IdEmp)
-        });
-    },
-    },
     methods:{
       cerrarDialogo(){
         this.dialog=false;
       },
+      /** Método encargado de recuperar los tickets de todos los empleados asociados a una empresa
+      * @public
+      * @param firebaseDB Instancia de la base de datos de Firestore que nos permite trabajar con ella
+      * @param {string} IdEmp Id de la empresa de la que queremos recuperar todos los tickets creados
+      */
       async recuperaTickets(firebaseDB,IdEmp){
         const consulta =  query(collection(firebaseDB, "Tickets"), where("IdEmpresa", "==", IdEmp));
         const querySnapshot = await getDocs(consulta);
@@ -164,6 +152,10 @@
           ticket.Fecha += '-' + await fechita.getFullYear();
         });
       },
+      /** Método encargado de cambiar el estado de un ticket a resuelto, se actualizará su atributo de estado
+       * dentro de la base de datos
+      * @public
+      */
       async marcarResuelto(){
 
         const firebaseDB= getFirestore(firebaseApp);
@@ -182,6 +174,9 @@
 
         this.boolExito=true;
       },
+      /** Método encargado de eliminar un ticket, se eliminará su registro dentro de la base de datos
+      * @public
+      */
       async borrarTicket(){
        
         this.boolConfirmaBorrar=false;
@@ -199,6 +194,10 @@
         this.boolExito=true;
         }
       },
+      /** Método encargado de comprobar si existe al menos un ticket seleccionado antes de realizar cualquier tipo de acción, 
+       * ya sea borrarlo o modificarlo
+      * @public
+      */
       comprobarSeleccionados(flag){
         if(this.seleccionados[0].Asunto && flag==0){
           this.boolConfirmacion=true;
@@ -207,10 +206,30 @@
           this.boolConfirmaBorrar=true;
         }
       },
+      /** Método encargado de recargar la página para que se muestren los cambios realizados
+      * @public
+      */
       recargarPagina(){
         location.reload();
+      },
+      /** Método encargado de recuperar el ID del administrador correspondiente
+       * @public
+       */
+      async recuperaTicketsTrabajadores(){
+        //Buscamos IdEmpresa de este administrador
+        const firebaseDB= getFirestore(firebaseApp);
+        const auth = getAuth();
+        const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
+        const querySnapshot = await getDocs(consulta);
+          querySnapshot.forEach((doc) => {
+            var IdEmp=doc.get("IdEmpresa")
+            console.log("la ID EMPRESA ES "+IdEmp);
+            this.recuperaTickets(firebaseDB,IdEmp)
+          });
       }
-
+    },
+    mounted(){
+      this.recuperaTicketsTrabajadores();
     }
   }
    

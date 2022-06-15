@@ -54,9 +54,15 @@
 
 <script>
 
- import { getAuth, sendPasswordResetEmail,  } from "firebase/auth";
- 
+import { getAuth, sendPasswordResetEmail,  } from "firebase/auth";
+
+/** 
+ * Vista encargada de proporcionar un correo electrónico de recuperación de la contraseña 
+ * @public 
+ * @displayName PasswordOlvidada
+ */
 export default({
+  
    data(){
       return{
          correo: '',
@@ -67,8 +73,10 @@ export default({
    },
     name: 'Login',
     methods:{
-        
-          enviarMail(){
+         /** Método encargado del envío del email 
+         * @public
+         */
+         enviarMail(){
             if(this.correo){
                 const auth=getAuth();
                 try{ //Se envía un mensaje de resauración de la contraseña al email

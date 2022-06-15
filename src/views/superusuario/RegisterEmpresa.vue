@@ -157,6 +157,11 @@ import { getDownloadURL, getStorage, ref, uploadBytes } from "@firebase/storage"
 
 const functions = getFunctions(firebaseApp);
 
+ /** Vista encargada de los registros de nuevas empresas dentro del sistema
+  * @public
+  * @displayName  RegisterEmpresa
+*/
+
 export default({
     
     data(){
@@ -182,6 +187,9 @@ export default({
    },
     name: 'Registro',
     methods:{
+        /** Método encargado de comprobar si se encuentra toda la información necesaria para añadir una nueva empresa
+        * @public
+        */
         abreConfirmacion(){
             
             if(this.nombreEmp && this.direccion && this.localidad && this.cp && this.dedicacion && this.nombre && this.apellidos && this.correo){
@@ -192,9 +200,16 @@ export default({
                this.error='Faltan datos por añadir al formulario'
             }
         },
+        /** Método encargado de pasar a la ventana de registrar un administrador asociado a la empresa
+        * @public
+        */
         nextTab(){
             this.tab='tabadmin';
         },
+        /** Método encargado de realizar el propio registro de la empresa, se almacenará toda la información
+         * correspondiente en base de datos, tanto de la empresa como del nuevo usuario
+        * @public
+        */
         async registraEmpresa(){
             
             var password=generarPassword();
@@ -277,13 +292,22 @@ export default({
                });
 
         },
+        /** Método encargado de recargar la página tras el registro de una nueva empresa en el sistema
+        * @public
+        */
         recargaPagina(){
            this.$router.push('/empresas/3');
         },
+        /** Método encargado de recoger la imagen para una empresa
+        * @public
+        */
         imagenSeleccionada(evento){
           this.imagenSel=evento.target.files[0];
           console.log(this.imagenSel);
         },
+        /** Método encargado de subir la imagen para una empresa
+        * @public
+        */
         async subirImagen(){
           
           if(!this.imagenSel){
@@ -309,7 +333,9 @@ export default({
 
       return cadena;
    }
-
+    /** Función encargada de generar un ID identificativo para una empresa nueva
+    * @public
+    */
    function generaIdEmpresa() {
       const longitud = 6;
       const caracteres = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

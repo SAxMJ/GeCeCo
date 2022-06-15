@@ -3,29 +3,26 @@
 <v-container app>
     <v-card class="grey lighten-2">
       <v-container>
-        <v-card>EMPRESAS</v-card>
-      </v-container>
-
-      <v-container>
-        <v-card class="black">{{recuperaEmpresas}}
-          <v-row>
-          <v-col cols="5" md="8" >
-          </v-col>
-          <v-col cols="5" md="2" >
-          </v-col>
-          <v-col cols="5" md="1" >
-          </v-col>
-          <v-col cols="5" md="1" >
-            <router-link to="/registerempresa/3">
-              <v-btn small dark class="green"><v-icon medium>mdi-home-plus-outline</v-icon></v-btn>
-            </router-link>
-          </v-col>
-          <v-col cols="5" md="1" >
-          </v-col>
-          </v-row>
+        <v-card class="black">
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
+            <v-row>
+            <v-col cols="5" md="8" >
+            </v-col>
+            <v-col cols="5" md="2" >
+            </v-col>
+            <v-col cols="5" md="1" >
+            </v-col>
+            <v-col cols="5" md="1" >
+              <router-link to="/registerempresa/3">
+                <v-btn small dark class="green"><v-icon medium>mdi-home-plus-outline</v-icon></v-btn>
+              </router-link>
+            </v-col>
+            <v-col cols="5" md="1" >
+            </v-col>
+            </v-row>
+          </v-img>
         </v-card>
-      </v-container>
-      <v-container id="regular-tables-view" fluid tag="section">
+        <v-card>EMPRESAS</v-card>
           <v-data-table  v-model="seleccionados" :headers="headers" :items="empresas" :single-select="true" item-key="IdEmpresa"  class="elevation-1">
           <template v-slot:top>
           </template>
@@ -49,6 +46,10 @@
   import firebaseApp from '../../scripts/firebase'
   import {query, getDocs} from "firebase/firestore";
 
+  /** Ventana en la que se recuperarán y mostrarán todas las empresas registradas dentro de la aplicación
+   * además, se podrá solicitar y acceder a la información completa de una empresa
+  * @public
+  */ 
   export default{
     data (){
       return{
@@ -76,23 +77,28 @@
     components:{
       BarraLateralSuperUsu
     },
-   computed:{  
-      async recuperaEmpresas(){
-        const firebaseDB= getFirestore(firebaseApp);
-        const consulta =  query(collection(firebaseDB, "Empresas"));
-        const querySnapshot = await getDocs(consulta);
-          querySnapshot.forEach((doc) => {
-            this.empresas.push(doc.data());
-          });
-      },
-    },
     methods:{
-
+      /** Método encargado de proporcionarnos acceso a la información completa de una empresa
+       * @public
+       * @param {Object} empresa Nos proporciona el Id Correspondiente a la empresa a la que queremos acceder
+       */
       VerEmpresa(empresa){
         console.log("usuario: "+empresa.idempresa);
         this.$router.push('/fichaempresa/3/'+empresa.IdEmpresa);
       },
-
+      
+      /** Método encargado de recuperar las empresas que se encuentran registradas en el sistema */
+      async recuperaEmpresas(){
+      const firebaseDB= getFirestore(firebaseApp);
+      const consulta =  query(collection(firebaseDB, "Empresas"));
+      const querySnapshot = await getDocs(consulta);
+        querySnapshot.forEach((doc) => {
+          this.empresas.push(doc.data());
+        });
+      },
+    },
+    mounted(){
+      this.recuperaEmpresas();
     }
   }
 </script>

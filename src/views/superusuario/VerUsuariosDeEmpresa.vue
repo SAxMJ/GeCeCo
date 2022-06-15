@@ -2,77 +2,19 @@
 <v-main>
 <v-container app>
     <div>
-    <v-card>USUARIOS DE LA EMPRESA</v-card>
     <v-card class="grey lighten-2"> 
-
-      <v-container id="regular-tables-view" fluid tag="section">
-         <v-card class="black">{{recuperaUsuariosPorIdEmpresa}}</v-card>
-          <v-data-table  v-model="usuariosSeleccionados" :headers="headerUsuarios" :items="usuarios" :single-select="true" item-key="Correo"   show-select class="elevation-1">
-          <template v-slot:top>
-          </template>
-          </v-data-table>
+     <v-container>
+      <v-card class="black">
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg"></v-img>
+      </v-card>
+        <v-card>USUARIOS DE LA EMPRESA</v-card>
+        <v-data-table  v-model="seleccionados" :headers="headers" :items="usuarios" :single-select="true" item-key="Correo" class="elevation-1">
+        <template v-slot:item.actions="{ item }">
+          <v-icon medium class="mr-2" @click="VerUsuario(item)">mdi-eye</v-icon>
+        </template>
+        </v-data-table>
         <div class="py-3" />
-   
-  </v-container>
-      <v-container v-if="usuariosSeleccionados.Correo!==null"> 
-        {{compruebaUsuarios()}}
-      <v-row justify="center">
-      <v-col cols="12" md="8">
-        <v-card icon="mdi-account-outline">  
-          <v-card class="black"></v-card>
-          <v-form>
-            <v-container class="py-0">
-              <v-row align-content-center>
-                <v-col cols="12" md="4" >
-                  <v-text-field color="black" label="Nombre" v-model= "nombreUsuario" readonly />
-                </v-col> 
-
-                <v-col cols="12" md="4">
-                  <v-text-field color="black" label="Apellidos" v-model= "apellidosUsuario" readonly />
-                </v-col>
-
-                <v-col align-content-space- cols="12" md="4">
-                  <v-img align-center max-height="100" max-width="100" :src="imgurlUsuario"></v-img>
-                  <v-menu v-if="usuarioSeleccionado===true" offset-y>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon color="black" dark v-bind="attrs" v-on="on"><v-icon dark>mdi-cog</v-icon></v-btn>
-                  </template>
-                  <v-list dark>
-                    <v-list-item
-                      v-for="(opcionesUsuarios, index) in opcionesUsuarios"
-                      :key="index"
-                      @click="itemSeleccionadoUsuarios(index)"
-                    >
-                      <v-list-item-title>{{ opcionesUsuarios.title }}</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-                </v-col>
-
-                <v-col cols="12" md="6">
-                  <v-text-field color="black" label="Email" v-model= "emailUsuario" readonly />
-                </v-col>
-
-                <v-col cols="12" md="6">
-                  <v-text-field color="black" label="Empresa" v-model= "nombre" readonly />
-                </v-col>
-
-                <v-col cols="12">
-                  <v-text-field color="black" label="ROL:" v-model= "rolUserUsuario" readonly />
-                </v-col>
-
-                <v-col cols="12" class="text-right">
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-form>
-        </v-card>
-      </v-col>
-      </v-row>
-      <div class="py-3" />
-      <v-container>
-      <v-btn class="primary" @click="volverAEmpresas">Volver</v-btn> 
-      </v-container>
+          
       </v-container>
 
       <!--DIÁLOGO DE CONFIRMACIÓN DE RESTABLECIMIENTO DE CONTRASEÑA-->
@@ -207,6 +149,11 @@
 //Esto es para poder llamar a las funciones del backend
 const functions = getFunctions(firebaseApp);
 
+ /** Vista que permite a los super usuarios acceder a una lista de los usuarios o trabajadores asociados a una
+  * empresa determinada
+  * @public
+  */
+
   export default{
     data (){
       return{
@@ -227,11 +174,12 @@ const functions = getFunctions(firebaseApp);
         flagMostrarTrabajadores:false,
         usuariosSeleccionados: [],
         usuarios:[],
-        headerUsuarios:[
+        headers:[
           {text: 'Nombre',value: "Nombre"},
           {text: 'Apellidos', value: "Apellidos"},
           {text: 'Correo', value: "Correo"},
-          {text: 'Rol', value: "ROL"}
+          {text: 'Rol', value: "ROL"},
+          {text: 'Ver usuario', value: "actions"}
         ],
 
         nombre:"",
@@ -259,33 +207,10 @@ const functions = getFunctions(firebaseApp);
     components:{
       BarraLateralSuperUsu
     },
-   computed:{  
-       async recuperaUsuariosPorIdEmpresa(){
-        this.usuarios=[];
-        this.nombreUsuario="";
-        this.apellidosUsuario="";
-        this.emailUsuario="";
-        this.empresaUsuario="";
-        this.rolUserUsuario="";
-        console.log("El nombre"+this.nombreModifica);
-        const firebaseDB= getFirestore(firebaseApp);
-        const consulta =  query(collection(firebaseDB, "Trabajadores"), where("IdEmpresa", "==", this.idEmpresa));
-        const querySnapshot = await getDocs(consulta);
-        
-        querySnapshot.forEach((doc) => {
-          this.usuarios.push(doc.data());
-        });
-        this.flagMostrarTrabajadores=true;
-
-        const consulta2 =  query(collection(firebaseDB, "Empresas"), where("IdEmpresa", "==", this.idEmpresa));
-        const querySnapshot2 = await getDocs(consulta2);
-         querySnapshot2.forEach((doc) => {
-          this.nombre=doc.get("Nombre");
-        });
-      },
-    },
     methods:{
-    
+       /** Método encargado de restablecer el valor de los flags
+        * @public
+        */
       reseteaFlags(){
         this.flagmodificauser=false;
         this.flagbajausuario=false;
@@ -293,7 +218,11 @@ const functions = getFunctions(firebaseApp);
         this.flagbajaempresa=false;
         this.flagmodificapass=false;
       },
-
+       /** Método encargado de comprobar cual ha sido la opción seleccionada a realizar con un usuario, 
+        * estás opciones serán: Restablecer su contraseña, modificar su información o darlo de baja.
+        * @public
+        * @param {Number} index Valor flag utilizado para seleccionar la acción en función de la opción seleccionada
+        */
       itemSeleccionadoUsuarios(index){
         if(index==0){
           this.flagmodificapass=true;
@@ -313,6 +242,9 @@ const functions = getFunctions(firebaseApp);
         }
       },
 
+      /** Método encargado de comprobar si existe algún usuario seleccionado
+      * @public
+      */
       compruebaUsuarios(){
         console.log("Entro comprueba");
         if(!this.flagmodificandousuario){
@@ -333,7 +265,9 @@ const functions = getFunctions(firebaseApp);
           }
         }
       },
-
+      /** Método encargado de recoger los datos de un usuario
+      * @public
+      */
       async GetDatosUsuario(){
           this.nombreUsuario=this.usuariosSeleccionados[0].Nombre;
           this.apellidosUsuario=this.usuariosSeleccionados[0].Apellidos;
@@ -343,6 +277,9 @@ const functions = getFunctions(firebaseApp);
           this.empresaUsuario=this.nombre;
       },
 
+      /** Método encargado de dar de baja a un usuario de la empresa
+      * @public
+      */
       async darDeBajaUsuario(){
         const firebaseDB= getFirestore(firebaseApp);
         const darDeBajaUsuario=httpsCallable(functions,"darDeBajaUsuario");
@@ -368,6 +305,9 @@ const functions = getFunctions(firebaseApp);
         });
       },
 
+      /** Método encargado de enviar un correo de restablecimiento de contraseña
+        * @public
+        */
       async restablecerPassUsuario(){
         console.log("PUMBA! SE ENVIÓ EL CORREO")
         await sendPasswordResetEmail(getAuth(),this.usuariosSeleccionados[0].Correo);
@@ -375,6 +315,9 @@ const functions = getFunctions(firebaseApp);
         this.flagexito=true;
       },
 
+      /** Método encargado de modificar la información de un usuario
+        * @public
+      */
       async modificarUsuario(){
         const firebaseDB= getFirestore(firebaseApp);
        //COMPROBAMOS AQUI LAS variableModifica JUNTO CON LAS VARIABLES NORMALES PARA HACER SOLO LAS MODIFICACIONES NECESARIAS
@@ -411,11 +354,51 @@ const functions = getFunctions(firebaseApp);
           this.flagexito=true;
         });
       },
+      /** Método encargado de devolvernos a la vista de la ficha de la empresa
+        * @public
+      */
       volverAEmpresas(){
         this.$router.push('/fichaempresa/3/'+this.idEmpresa);
-      }
+      },
 
+      /** Método encargado de recuperar todos los usuarios de la empresa
+      * @public
+      */
+      async recuperaUsuariosPorIdEmpresa(){
+        this.usuarios=[];
+        this.nombreUsuario="";
+        this.apellidosUsuario="";
+        this.emailUsuario="";
+        this.empresaUsuario="";
+        this.rolUserUsuario="";
+        console.log("El nombre"+this.nombreModifica);
+        const firebaseDB= getFirestore(firebaseApp);
+        const consulta =  query(collection(firebaseDB, "Trabajadores"), where("IdEmpresa", "==", this.idEmpresa));
+        const querySnapshot = await getDocs(consulta);
+        
+        querySnapshot.forEach((doc) => {
+          this.usuarios.push(doc.data());
+        });
+        this.flagMostrarTrabajadores=true;
 
+        const consulta2 =  query(collection(firebaseDB, "Empresas"), where("IdEmpresa", "==", this.idEmpresa));
+        const querySnapshot2 = await getDocs(consulta2);
+          querySnapshot2.forEach((doc) => {
+          this.nombre=doc.get("Nombre");
+        });
+      },
+      /** Método encargado de acceder a la información de un empleado de la empresa
+     * @public
+     * @param {Object} usuario Objeto que contendrá información relevante que nos permitirá 
+     * indentificar al usuario para poder recuperar su información posteriormente.
+      */
+      VerUsuario(usuario){
+        console.log("usuario: "+usuario.Correo);
+        this.$router.push('/verusuario/3/'+usuario.Correo);
+      },
+    },
+    mounted(){
+      this.recuperaUsuariosPorIdEmpresa();
     }
   }
 </script>

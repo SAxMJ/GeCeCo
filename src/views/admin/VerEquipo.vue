@@ -3,7 +3,7 @@
     <div>
         <v-container>
         <v-card>VER EQUIPO</v-card>
-        <v-card class="black">{{RecuperaInfoEquipo}}</v-card>
+        <v-card class="black"></v-card>
         <v-container class="grey lighten-2">
         <v-row rows="12" md="6">
             
@@ -11,6 +11,7 @@
                 <v-card>
                     <template>
                         <v-treeview :items="itemsPROCESOS">Procesos</v-treeview>
+                        <v-btn icon color="blue" @click="boolVerServicios=true"><v-icon>mdi-table-eye</v-icon></v-btn>
                     </template>
                 </v-card>
             </v-col>
@@ -26,7 +27,7 @@
             <v-col cols="12" md="4">
                 <v-card width="600px" height="400px">
                 <v-container width="20" height="20">
-                    <v-card>INFO SISTEMA</v-card>
+                    <v-card>{{nombreEquipoMuestra}}</v-card>
                     <v-card-title class="justify-center" >{{distro}}</v-card-title>
                     <v-card-text>{{platform}}</v-card-text>
                     <v-card-text>{{arch}}</v-card-text>
@@ -68,7 +69,7 @@
             <v-col cols="12" md="2">
             <v-card>
                 <template>
-                    <v-treeview :items="itemsBATERIA">BATERÍA</v-treeview>
+                    <v-treeview v-if="boolMuestraBateria==true" :items="itemsBATERIA">BATERÍA</v-treeview>
                 </template>
             </v-card>
             </v-col>
@@ -144,6 +145,22 @@
         </template>
         </v-dialog> 
 
+        <!--VER SERVICIOS-->
+      <v-dialog width="1000" v-model="boolVerServicios">
+        <v-container class="grey lighten-2" id="regular-tables-view" fluid tag="section">
+            <v-card>SERVICIOS Y PROCESOS</v-card>
+            <view-intro heading="Simple Tables" link="components/simple-tables"/>
+            <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
+            <v-data-table  :headers="cabecerasServicios" :items="serviciosyprocesos" :single-select="true"   class="elevation-1">
+                <template v-slot:top>
+                </template>
+                </v-data-table>
+                <div class="py-3" />
+            </material-card>
+            <v-btn color="red darken-1" text @click="boolVerServicios=false">CERRAR</v-btn>
+            </v-container>
+      </v-dialog>
+
     </v-container>
     
     </v-container>
@@ -157,12 +174,17 @@
 <script>
   import BarraLateralAdmin from '../../components/BarraLateralAdmin.vue'
   import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
-  import {getFirestore, collection, updateDoc,doc, deleteDoc, orderBy, limit} from "firebase/firestore"
+  import {getFirestore, collection, updateDoc,doc, deleteDoc, orderBy, limit, getDoc} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
   import {query, where, getDocs,addDoc} from "firebase/firestore";
    
-    const firebaseDB= getFirestore(firebaseApp);
+  const firebaseDB= getFirestore(firebaseApp);
 
+  /** Ventana donde se muestra la información completa sobre un equipo, como los avisos que generó, la información de su última
+   * lectura de monitorización y un histórico con todas sus monitorizaciónes ordenadas cronológicamente.
+   * Además se proporcionará la posibilidad de dar de baja el equipo del sistema.
+   * @public
+   */
   export default{
     data (){
       return{
@@ -171,7 +193,7 @@
         idEquipo: this.$route.params.idEquipo,
         avisos:[],
         cabecerasAvisos:[
-          {text: 'IdEquipo',value: "IdEquipo"},
+          {text: 'Nombre equipo',value: "NombreEquipo"},
           {text: 'Tipo', value: "Tipo"},
           {text: 'TipoElemento', value: "TipoElemento"},
           {text: 'Limite', value: "Limite"},
@@ -194,6 +216,13 @@
             {text: 'IFACE Conex', value: "CONNEXION[0].iface"},
             {text: 'ESTADO Iface', value: "CONNEXION[0].operstate"},
             {text: 'Fecha / Hora', value: "Fecha"},
+        ],
+        serviciosyprocesos:[],
+        cabecerasServicios:[
+            {text: 'Servicio', value: "name"},
+            {text: 'Estado activo', value: "running"},
+            {text: 'PIDs', value: "pids"},
+            {text: 'Arranque', value: "startmode"},
         ],
 
         itemsCPU:[{
@@ -246,15 +275,44 @@
         boolcarga: true,
         boolConfirmaEliminacion:false,
         boolExito:false,
+        boolMuestraBateria:true,
+        boolVerServicios:false,
+        nombreEquipoMuestra:"",
       }
     },
     components:{
       BarraLateralAdmin,
       BarraLateralSuperUsu
     },
-   computed:{ 
+    methods:{
+
+    /** Método encargado de eliminar el equipo 
+     * @public
+    */
+        async eliminarEquipoDelSistema(){
+
+            const docRef = doc(firebaseDB, "Equipos", this.idEquipo);
+            await deleteDoc(docRef);
+
+            this.boolExito=true;
+        },
+        
+        /** Método encargado de volver a la ventana de equipos tras la eliminación de un equipo 
+        * @public
+        */
+        volverAEquipos(){
+            this.$router.push('/equipos/2');
+        },
+
+        /** Método encargado de recuperar y tratar la información correspondiente a la lectura de información de un equipo
+         * para que pueda ser mostrada de forma más legible
+         */
        async RecuperaInfoEquipo(){
-           console.log("RecuperaInfo: "+this.idEquipo)
+
+            const docRef=doc(firebaseDB, "Equipos", this.idEquipo);
+            const docSnap = await getDoc(docRef);
+            this.nombreEquipoMuestra=docSnap.get("NombreEquipo")
+
             const consulta2 = query(collection(firebaseDB,"Equipos/"+this.idEquipo+"/Monitorizacion"),orderBy("Fecha","desc"),limit(1));
             const querySnapshot2=await getDocs(consulta2);
             querySnapshot2.forEach(async (infoMonit) => { 
@@ -328,8 +386,19 @@
                 this.kernel="Kernel: "+infoMonit.get("OSINFO").kernel;
 
                 this.itemsPROCESOS[0].children.push({id:2, name:"Total: "+infoMonit.get("PROCESOS")})
+                
+                if(infoMonit.get("OSINFO").platform=="Windows"){
+                    this.boolMuestraBateria=false;
+                }
 
                 this.boolcarga=false;
+
+                var todosLosServicios=infoMonit.get("SERVICIOS");
+                
+                for(var seleccionado in todosLosServicios){
+                    this.serviciosyprocesos.push(todosLosServicios[seleccionado])
+                }
+
             });
 
             const avisosRef = collection(firebaseDB, 'AvisosDeAlerta');
@@ -382,19 +451,12 @@
             historicoMonito.Fecha += '-'+ await fechita.getUTCMonth();
             historicoMonito.Fecha += '-' + await fechita.getFullYear();
             });
+
+           
        }
     },
-    methods:{
-        async eliminarEquipoDelSistema(){
-
-            const docRef = doc(firebaseDB, "Equipos", this.idEquipo);
-            await deleteDoc(docRef);
-
-            this.boolExito=true;
-        },
-        volverAEquipos(){
-            this.$router.push('/equipos/2');
-        }
+    mounted(){
+        this.RecuperaInfoEquipo();
     }
   }
 

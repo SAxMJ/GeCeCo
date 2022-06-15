@@ -76,6 +76,11 @@ import { getFunctions } from "firebase/functions"
 
 const functions = getFunctions(firebaseApp);
 
+ /** Vista que nos permite registrar nuevos super usuarios dentro del sistema
+  * @public
+  * @displayName RegisterSuperUsu
+  */
+
 export default({
     
     data(){
@@ -90,6 +95,10 @@ export default({
    },
     name: 'Registro',
     methods:{
+        /** Método encargado de registrar nuevos usuarios SuperUsuarios, se llamará a la Cloud Function correspondiente
+         * y posteriormente se almacenará la información necesaria en la base de datos de Firestore
+        * @public
+        */
         async registraSuperUsuario(){
             var password=generarPassword();
             console.log(password);
@@ -142,9 +151,15 @@ export default({
               this.error='Faltan datos por añadir al formulario'
             }
       },
+       /** Método encargado de voler a la vista de SuperUsuarios tras el registro del nuevo SuperUsuario
+        * @public
+        */
       volverASuperusuarios(){
          this.$router.push('/superusuarios/3');
       },
+       /** Método encargado de resetear flags
+        * @public
+        */
       reseteaFlags(){
           this.error="";
           this.flagexito=false;

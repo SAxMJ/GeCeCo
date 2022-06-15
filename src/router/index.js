@@ -312,6 +312,9 @@ function ejecutaRuta(rol,to,next){
         console.log(to.path);
         next()
       }
+      else if(to.path!=='/verusuario/2/'+x[3] && to.path!=='registeradmin/1' && to.path==='/verusuario/3/'+x[3]){ //Controlaremos que solo si es un admin pueda acceder
+        next()
+      }
       else if(to.path==='/'){
           next();
       }

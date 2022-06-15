@@ -14,7 +14,7 @@
           <v-col cols="12" md="0">
           </v-col>
           <v-col cols="12" md="12">
-            <v-card class="black">{{GetDatosEmpresa()}}</v-card>
+            <v-card class="black"></v-card>
           </v-col>
       </v-row>
         <v-card icon="mdi-account-outline">  
@@ -168,6 +168,10 @@ const functions = getFunctions(firebaseApp);
   var rolUsr=1;
   console.log("Es--> " +rolUsr);
   
+  /** Vista encargada de mostrar la información correspondiente a una empresá así como de proporcionar
+  * diferentes acciones como dar de baja la empresa o acceder a los usuarios que están asociados a la misma
+  * @public 
+  */
   export default{
     data (){
       return{
@@ -206,6 +210,9 @@ const functions = getFunctions(firebaseApp);
       BarraLateralSuperUsu
     },
     methods:{
+      /**Método encargado de recuperar la información correspondeinte a la empresa que se solicita
+     * @public
+     */
       async GetDatosEmpresa(){
         const firebaseDB= getFirestore(firebaseApp);
 
@@ -222,6 +229,11 @@ const functions = getFunctions(firebaseApp);
             this.imgurl=doc.get("URLImage");
           });
       },
+       /** Método encargado de comprobar cual ha sido la opción seleccionada a realizar con la empresa, 
+         * estás opciones serán: Registra un usuario, consultar los trabajadores de la empresa o dar de baja la empresa.
+        * @public
+        * @param {Number} index Valor flag utilizado para seleccionar la acción en función de la opción seleccionada
+        */
       itemSeleccionado(index){
         if(index==0){
           this.flagregistrausuario=true;
@@ -231,10 +243,13 @@ const functions = getFunctions(firebaseApp);
           this.$router.push('/verusuariosdeempresa/3/'+this.idEmpresa);
         }
         else if(index==2){
-          console.log("Queremos dar de baja el usuario")
           this.flagbajaempresa=true;
         }
       },
+       /** Método encargado de registrar un nuevo trabajador para la empresa, se llamará a la Cloud Function correspondiente
+        * y posteriormente se añadirá la información necesaria a la base de datos de Firestore.
+        * @public
+        */
       registraTrabajador(){
          var password=generarPassword();
             console.log(password);
@@ -285,6 +300,10 @@ const functions = getFunctions(firebaseApp);
               this.error='Faltan datos por añadir al formulario'
             }
       },
+       /** Método encargado de dar de baja una empresa del sistema, se eliminará la información de dicha empresa
+        * de la base de datos de Firebase
+        * @public
+        */
       async darDeBajaEmpresa(){
         const firebaseDB= getFirestore(firebaseApp);
         const darDeBajaUsuario=httpsCallable(functions,"darDeBajaUsuario");
@@ -318,18 +337,30 @@ const functions = getFunctions(firebaseApp);
             this.flagbajaempresa=false;
             this.flagexitobajaempresa=true;
       },
+       /** Método encargado de restablecer los flags que se encargan de mostrar los diálogos utilizados para
+        * las diferentes acciones
+        * @public
+        */
       reseteaFlags(){
         this.flagregistrausuario=false;
         this.flagexito=false;
         this.flagbajaempresa=false;
       },
+       /** Método encargado de voler a la vista de las empresas tras la eliminación de la empresa
+        * @public
+        */
       volverAEmpresas(){
         this.$router.push('/empresas/3');
       }
+    },
+    mounted(){
+      this.GetDatosEmpresa();
     }
   }
 
-   //Función encargada de generar una contraseña de 10 caracteres aleatorios
+    /** Función encargada de generar una contraseña para el nuevo trabajador añadido a la empresa
+    * @public
+    */
    function generarPassword() {
       const longitud = 10;
       const caracteres = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

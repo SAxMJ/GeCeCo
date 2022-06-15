@@ -6,7 +6,7 @@
   <v-card>FICHA DE USUARIO</v-card>
     <v-container id="user-profile-view" fluid tag="section">
         <v-card icon="mdi-account-outline">
-          <v-card class="black">{{GetDatosUsuario}}</v-card>
+          <v-card class="black"></v-card>
           <v-form>
             <v-container class="py-0">
               <v-row align-content-center>
@@ -186,10 +186,17 @@
   import { getFunctions } from "firebase/functions"
   import { httpsCallable } from "firebase/functions";
 
+
   var rolUsr=1;
   console.log("Es--> " +rolUsr);
   
   const functions = getFunctions(firebaseApp);
+
+  const firebaseDB= getFirestore(firebaseApp);
+/** Ventana donde se muestra la información completa sobre un trabajador, así como diferentes opciones 
+* como darlo de baja, modificar su información o restablecer su contraseña
+* @public
+*/
 
   export default{
     data (){
@@ -228,32 +235,13 @@
     components:{
       BarraLateralAdmin,
       BarraLateralSuperUsu
-    }, computed:{ 
-        async GetDatosUsuario(){
-        const firebaseDB= getFirestore(firebaseApp);
-        var codEmp;
-
-        //Buscamos el nombre, apellidos, email y empresas
-        const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", ""+this.$route.params.correoUsuario));
-        const querySnapshot = await getDocs(consulta);
-          querySnapshot.forEach(async(doc) => {
-            this.nombre=doc.get("Nombre");
-            this.apellidos=doc.get("Apellidos");
-            this.email=doc.get("Correo");
-            this.imgurl=doc.get("URLImage");
-            this.rolUser=doc.get("ROL");
-            codEmp=doc.get("IdEmpresa")
-          });
-            console.log("El codemp "+this.img+"y "+this.$route.params.correoUsuario);
-          //Buscamos el nombre de la empresa
-          const consulta3 =  query(collection(firebaseDB, "Empresas"), where("IdEmpresa", "==", codEmp));
-          const querySnapshot3 = await getDocs(consulta3);
-          querySnapshot3.forEach((doc) => {
-            this.empresa=doc.get("Nombre");
-          });
-        },
-    },
+    }, 
     methods:{
+        /** Método encargado de comprobar cual ha sido la opción seleccionada realizar con el usuario, 
+         * estás opciones serán: Restablecer contraseña, modificar el usuario o darlo de baja.
+        * @public
+        * @param {Number} index Valor flag utilizado para seleccionar la acción en función de la opción seleccionada
+        */
         itemSeleccionado(index){
         if(index==0){
           this.flagmodificapass=true;
@@ -272,12 +260,21 @@
           this.flagbajausuario=true;
           this.flagmodificapasshecho=true;
         }
-      },async restablecerPass(){
+      },
+      /** Método encargado de enviar un correo de restablecimiento de contraseña al usuario correspondiente
+      * @public
+      */
+      async restablecerPass(){
         console.log("PUMBA! SE ENVIÓ EL CORREO")
         await sendPasswordResetEmail(getAuth(),this.email);
         this.flagmodificapass=false;
         this.flagexito=true;
       },
+      /** Método encargado de modificar la información correspondiente al usuario, se llamará a la Cloud Function
+      * que modifica el correo del usuario en el caso de que sea necesario.
+      * Posteriormente estos cambios serán también actualizados en las bases de datos correspondientes
+      * @public
+      */
       async modificarUsuario(){
         const firebaseDB= getFirestore(firebaseApp);
        //COMPROBAMOS AQUI LAS variableModifica JUNTO CON LAS VARIABLES NORMALES PARA HACER SOLO LAS MODIFICACIONES NECESARIAS
@@ -314,6 +311,10 @@
           this.flagexito=true;
         });
       },
+      /** Método encargado de dar de baja a un usuario, para ello se llamará a la Cloud Function correspondiente
+      * y posteriormente se eliminarán sus registros correspondientes de las bases de datos.
+      * @public
+      */
       async darDeBajaUsuario(){
         const firebaseDB= getFirestore(firebaseApp);
         //const darDeBajaUsuario=httpsCallable(functions,"darDeBajaUsuario");
@@ -341,16 +342,61 @@
         }).catch((error)=>{
             console.log("ERROR al eliminar usuario "+this.email+": "+error);
         });
-      }, 
-      recargarPagina(){
-        this.$router.push('/usuarios/2');
       },
+      /** Método encargado de recargar la página tras una actualización para que se muestren los cambios
+      * @public
+      */ 
+      async recargarPagina(){
+        if(this.rol==2)
+          this.$router.push('/usuarios/2');
+
+        if(this.rol==3){
+          const q = query(collection(firebaseDB, "Empresas"), where("Nombre", "==", this.empresa));
+          const querySnapshot = await getDocs(q);
+          querySnapshot.forEach((doc) => {
+            this.idEmpresa=doc.get("IdEmpresa")
+          });
+          this.$router.push('/verusuariosdeempresa/3/'+this.idEmpresa);
+        }
+      },
+      /** Método encargado de restablecer los flag con los que trabajan los diferentes diálogos de la ventana
+      * @public
+      */ 
       reseteaFlags(){
         this.flagmodificapass=false;
         this.flagmodificauser=false;
         this.flagbajausuario=false;
         this.flagexito=false;
-      }
+      },
+        /**Método encargado de recuperar la información correspondeinte al usuario que se solicita
+         * @public
+         */
+        async GetDatosUsuario(){
+        const firebaseDB= getFirestore(firebaseApp);
+        var codEmp;
+
+        //Buscamos el nombre, apellidos, email y empresas
+        const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", ""+this.$route.params.correoUsuario));
+        const querySnapshot = await getDocs(consulta);
+          querySnapshot.forEach(async(doc) => {
+            this.nombre=doc.get("Nombre");
+            this.apellidos=doc.get("Apellidos");
+            this.email=doc.get("Correo");
+            this.imgurl=doc.get("URLImage");
+            this.rolUser=doc.get("ROL");
+            codEmp=doc.get("IdEmpresa")
+          });
+            console.log("El codemp "+this.img+"y "+this.$route.params.correoUsuario);
+          //Buscamos el nombre de la empresa
+          const consulta3 =  query(collection(firebaseDB, "Empresas"), where("IdEmpresa", "==", codEmp));
+          const querySnapshot3 = await getDocs(consulta3);
+          querySnapshot3.forEach((doc) => {
+            this.empresa=doc.get("Nombre");
+          });
+        },
+    },
+    mounted(){
+      this.GetDatosUsuario();
     }
   }
 </script>

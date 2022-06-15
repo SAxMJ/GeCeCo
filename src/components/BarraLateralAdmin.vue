@@ -1,37 +1,20 @@
-<template>
+<template> <!-- @slot Barra de navegación con la que contarán los administradores para navegar por la aplicación-->
       <v-navigation-drawer app  :mini-variant.sync="mini" permanent class="secondary">
+        <v-card class="transparent">
+            <v-card-title class="justify-center" >
+              <v-img width="100" class="justify-center" src="../images/LogoTrasparente2.png">
+              </v-img>
+           </v-card-title>
+        </v-card>
         <v-list-item class="px-2" dark>
           
           <v-list-item-avatar>
             <v-img :src="fotourl">
             
-              <div class="text-center">
-                <v-menu offset-y>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="transparent" dark v-bind="attrs" v-on="on"></v-btn>
-                  </template>
-                  <v-list dark>
-                    <v-list-item
-                      v-for="(opciones, index) in opciones"
-                      :key="index"
-                      @click="cerrarSesion"
-                    >
-                      <v-list-item-title>{{ opciones.title }}</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </div>
-
+              
             </v-img>    
           </v-list-item-avatar>
-
         <v-list-item-title>ADMINISTRADOR</v-list-item-title>
-        <v-btn
-          icon
-          @click.stop="mini = mini"
-        >
-          <v-icon>mdi-chevron-left</v-icon>
-        </v-btn>
       </v-list-item>
 
       <v-divider></v-divider>
@@ -67,8 +50,24 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      {{getUrlFotoPerfilYAvisosAlerta}}
+      
+        <v-menu offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon dark v-on="on" ><v-icon dark>mdi-key-remove</v-icon>Cerrar sesión</v-btn>
+          </template>
+          <v-list dark>
+            <v-list-item
+              v-for="(opciones, index) in opciones"
+              :key="index"
+              @click="cerrarSesion"
+            >
+              <v-list-item-title>{{ opciones.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+    
       </v-navigation-drawer>
+      
 </template>
 
 <script>
@@ -81,10 +80,15 @@ import firebaseApp from '../scripts/firebase'
   var auth=getAuth();
   var user=auth.currentUser;
 
+/**
+ * Opciones de navegación para los Administradores 
+ * @public
+ */
   export default {
     data () {
       return {
         drawer: true,
+  
         items: [
           { title: 'Inicio', icon: 'mdi-home', path: '/paginainicio/2',},
           { title: 'Equipos', icon: 'mdi-chart-bar', path: '/equipos/2' },
@@ -103,6 +107,10 @@ import firebaseApp from '../scripts/firebase'
       }
     },
     methods:{
+    /** 
+    * Método encargado de eliminar la sesión creada 
+    * @public
+    */
       cerrarSesion(){
         const auth = getAuth();
         signOut(auth).then(() => {
@@ -110,10 +118,12 @@ import firebaseApp from '../scripts/firebase'
         }).catch((error) => {
           console.log("Error, no se cerró sesíon: "+error)
         });
-      }
-    },
-      computed:{
-      async getUrlFotoPerfilYAvisosAlerta(){ //Método para obtener la url de la foto de perfil
+      },
+      /** Método encargado de cargar la foto de perfil de la barra de navegación así como de las burbujas
+        * informativas referentes a si existen alertas y tickets sin resolver y cuantos
+        * @public
+        */
+        async getUrlFotoPerfilYAvisosAlerta(){
         var photo;
         const auth2=getAuth();
         user=auth2.currentUser;
@@ -161,8 +171,10 @@ import firebaseApp from '../scripts/firebase'
           querySnapshot3.forEach(async(doc) => {
             this.nTickets++;
           });
-
     }
-  }
+    },
+    mounted(){
+      this.getUrlFotoPerfilYAvisosAlerta()
+    }
   }
 </script>

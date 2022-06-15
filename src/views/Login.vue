@@ -49,6 +49,9 @@
 
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
+/** Vista encargada del Log-In de los usuarios
+* @public
+*/
 export default({
    data(){
       return{
@@ -59,6 +62,10 @@ export default({
    },
     name: 'Login',
     methods:{
+      
+         /** Método encargado de proporcionar la funcionalidade de Log-In 
+          * @public
+         */
          loginUsuario(){
 
             if(this.correo && this.password){

@@ -66,6 +66,11 @@ import { getDownloadURL, getStorage, ref } from '@firebase/storage';
 
 const functions = getFunctions(firebaseApp);
 
+/** Ventana que proporciona a los Administradores de las empresas, dar de alta nuevos epleados, ya sean otros Administradores
+ * o empleados normales.
+ * @displayName RegisterAdmin
+ * @public
+ */
 export default({
    data(){
       return{
@@ -84,6 +89,12 @@ export default({
     },
     name: 'Registro',
     methods:{
+         /** Método encargado de realizar la llamada a la Cloud Function correspondiente encargada de 
+         * registrar un usuario y posteriormente de añadir los registros necesarios en base de datos.
+         * También se enviará un correo de restablecimiento de contraseña para que el usuario pueda
+         * establecer una contraseña.
+         * @public
+         */
         async registraTrabajador(){
             
             this.error='';
@@ -128,6 +139,9 @@ export default({
             }
             
         },
+        /** Método encargado de recargar la página tras el registro del nuevo empleado
+         * @public
+         */
         recargaPagina(){
            location.reload();
         }
@@ -136,9 +150,10 @@ export default({
 
 
 
-  //FUNCIONES
-
-   //Función encargada de generar una contraseña de 10 caracteres aleatorios
+   /** Función encargada de generar contraseñas aleatorias durante el registro de un nuevo usuario para asociarla
+   * a su cuenta
+   * @public
+   */
    function generarPassword() {
       const longitud = 10;
       const caracteres = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -152,7 +167,10 @@ export default({
       return cadena;
    }
 
-   //Función que obtiene el Id empresa del admin y registra al trabajador en la base de datos
+   
+   /** Función encargada de obtener el ID de un nuevo trabajador creado y añadir su información a la base de datos
+   * @public
+   */
    async function IdEmpresaAdminYAddTrabajador(firebaseDB,consulta,nombre,apellidos,correo,rol){
 
       const querySnapshot = await getDocs(consulta);

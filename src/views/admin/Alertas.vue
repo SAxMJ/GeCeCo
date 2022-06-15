@@ -4,7 +4,8 @@
   <v-container>
     <v-card class="grey lighten-2">
       <v-container>
-      <v-card class="black">{{recuperaAlertas}}
+      <v-card class="black">
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
         <v-row>
         <v-col cols="20" md="8" >
         </v-col>
@@ -22,10 +23,8 @@
         <v-col cols="20" md="1" >
          </v-col>  
         </v-row>
+        </v-img>
       </v-card>
-      </v-container>
-
-      <v-container id="regular-tables-view" fluid tag="section">
          <v-card>ALERTAS CREADAS</v-card>
         <view-intro heading="Simple Tables" link="components/simple-tables"/>
         <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
@@ -40,24 +39,25 @@
       
       <v-container>
         <v-card class="black">
-        <v-row>
-        <v-col cols="20" md="8" >
-        </v-col>
-        <v-col cols="20" md="9" >
-        </v-col>
-        <v-col cols="20" md="2" >
-        </v-col>
-        <v-col cols="20" md="1" >
-          <v-btn small dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
-        </v-col>
-        <v-col cols="20" md="1" >
-        </v-col>
-        <v-col cols="20" md="1" >
-        </v-col>
-        </v-row>
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="https://lh3.googleusercontent.com/-Bc-8gs1FxX8/WGY0iAJ32II/AAAAAAAA9SM/sR1dlDV1Pdg/s1200/terminal-reduced.png">
+          <v-row>
+          <v-col cols="20" md="8" >
+          </v-col>
+          <v-col cols="20" md="9" >
+          </v-col>
+          <v-col cols="20" md="2" >
+          </v-col>
+          <v-col cols="20" md="1" >
+            <v-btn small dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
+          </v-col>
+          <v-col cols="20" md="1" >
+          </v-col>
+          <v-col cols="20" md="1" >
+          </v-col>
+          </v-row>
+        </v-img>
       </v-card>
-      </v-container>
-        <v-container id="regular-tables-view" fluid tag="section">
+     
           <v-card>AVISOS DE ALERTAS</v-card>
           <view-intro heading="Simple Tables" link="components/simple-tables"/>
           <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
@@ -268,6 +268,12 @@
   var rolUsr=1;
   console.log("Es--> " +rolUsr);
   
+  /** Ventana de la aplicación encargada de mostrar las diferentes alertas creadas por el administrador
+   * así como los avisos generados en base a estas alertas.
+   * También se podrán crear, eliminar y modificar alertas, así como marcar avisos de alertas como ya atendidos
+   * @public
+   */
+  
   export default{
     data (){
       return{
@@ -306,7 +312,7 @@
           {value: "IdAviso"}
         ],
         cabecerasAvisos:[
-          {text: 'IdEquipo',value: "IdEquipo"},
+          {text: 'Nombre equipo',value: "NombreEquipo"},
           {text: 'Tipo', value: "Tipo"},
           {text: 'TipoElemento', value: "TipoElemento"},
           {text: 'Limite', value: "Limite"},
@@ -350,45 +356,14 @@
       BarraLateralAdmin,
       BarraLateralSuperUsu
     },
-   computed:{ //Cada vez que inicializamos la paginarecogemos los datos
-      async recuperaAlertas(){
-        const firebaseDB= getFirestore(firebaseApp);
-        const auth = getAuth();
-        const consulta =  query(collection(firebaseDB, "Alertas"), where("IdAdmin", "==", auth.currentUser.uid));
-        const querySnapshot = await getDocs(consulta);
-        
-        querySnapshot.forEach((doc) => {
-          this.alertas.push(doc.data());
-        });
-
-
-        const avisosRef = collection(firebaseDB, 'AvisosDeAlerta');
-        console.log(auth.currentUser.uid)
-        const consulta2 =  query(avisosRef, where("IdAdmin", "==", auth.currentUser.uid), orderBy("Fecha","desc"));
-        const querySnapshot2 = await getDocs(consulta2);
-        
-        var i=0;
-        querySnapshot2.forEach((doc) => {
-          this.avisos.push(doc.data());
-          this.avisos[i].IdAviso=doc.id;
-          i++;
-        });
-
-        console.log(this.avisos[0].IdAviso);
-
-        //Casteamos la fecha de cada ticket para darle un formato en el que mostrarlo
-        this.avisos.forEach(async function(aviso){
-          var fechita=await (aviso.Fecha).toDate()
-          aviso.Fecha = ''+ await fechita.getHours();
-          aviso.Fecha += ':'+ await fechita.getMinutes();
-          aviso.Fecha += ' / '+ await fechita.getDate();
-          aviso.Fecha += '-'+ await fechita.getMonth();
-          aviso.Fecha += '-' + await fechita.getFullYear();
-        });
-
-      },
+   computed:{
+      
     },
     methods:{
+      /** Método encargado de la creación de una alerta, se recogerán los diferentes parámetros establecidos y se
+       * almacenarán en base de datos de Firestore
+       * @public
+       */
       async almacenaAlerta(){
 
         var idEmpresa="";
@@ -458,6 +433,11 @@
           this.error="Hay campos vacíos";
         }
       },
+      /** Método encargado de controlar la acción que buscamos llevar a cabo con una alerta seleccionada, ya sea 
+       * eliminarla o modificarla
+       * @param {Number} opcion Valor utilizado como flag en función del botón pulsado
+       * @public
+       */
       compruebaAlertaSeleccionada(opcion){
         if(this.alertaSeleccionada[0]){
           if(opcion===1){ //Si la opcion es 1 entonces queremos borrar la alreta
@@ -473,6 +453,11 @@
           }
         }
       },
+
+      /** Método encargado de la eliminación de la propia alerta seleccionada, se eliminará su registro de la
+       * base de datos de Firestore
+       * @public
+       */
       async borrarLaAlerta(){
 
         const firebaseDB= getFirestore(firebaseApp);
@@ -484,6 +469,10 @@
         console.log("Alerta eliminada: ");
         this.flagExitoEliminarAlerta=true;
       },
+      /** Método encargado de la modificación de la propia alerta seleccionada, se modificarán y actualizarán sus
+       * parámetros en la base de datos de Firestore
+       * @public
+       */
       async actualizaAlerta(){
         const firebaseDB= getFirestore(firebaseApp);
         const consulta=query(collection(firebaseDB, "Alertas"),where("IdAlerta", "==",this.alertaSeleccionada[0].IdAlerta));
@@ -501,14 +490,24 @@
 
         this.flagExitoModificarAlerta=true;
       },
+      /** Método encargado de recargar la página tras la modificación de avisos o alertas para que se muestren los cambios
+       * @public
+       */
       recargaPagina(){
          location.reload();
       },
+      /** Método encargado de comprobar si existe algún aviso seleccionado antes de permitir realizar cualquier
+       * acción
+       * @public
+       */
       comprobarSeleccionados(){
         if(this.avisoSeleccionados[0].IdAviso){
           this.boolConfirmacionAviso=true;
         }
       },
+      /** Método encargado de marcar un aviso como atendido, se modificará su estado en el registro de la base de datos
+       * @public
+       */
       async marcarAvisoResuelto(){
 
         const firebaseDB= getFirestore(firebaseApp);
@@ -522,7 +521,50 @@
 
         this.boolConfirmacionAviso=false;
         this.boolExito=true;
-      }
+      },
+
+      /** Método encargado de recuperar y mostrar tanto las alertas como los avisos de alerta correspondientes
+       * al administrador que está accediendo a la ventana de alertas
+       * @public
+       */
+      async recuperaAlertas(){
+        const firebaseDB= getFirestore(firebaseApp);
+        const auth = getAuth();
+        const consulta =  query(collection(firebaseDB, "Alertas"), where("IdAdmin", "==", auth.currentUser.uid));
+        const querySnapshot = await getDocs(consulta);
+        
+        querySnapshot.forEach((doc) => {
+          this.alertas.push(doc.data());
+        });
+
+
+        const avisosRef = collection(firebaseDB, 'AvisosDeAlerta');
+        console.log(auth.currentUser.uid)
+        const consulta2 =  query(avisosRef, where("IdAdmin", "==", auth.currentUser.uid), orderBy("Fecha","desc"));
+        const querySnapshot2 = await getDocs(consulta2);
+        
+        var i=0;
+        querySnapshot2.forEach((doc) => {
+          this.avisos.push(doc.data());
+          this.avisos[i].IdAviso=doc.id;
+          i++;
+        });
+
+        console.log(this.avisos[0].IdAviso);
+
+        //Casteamos la fecha de cada ticket para darle un formato en el que mostrarlo
+        this.avisos.forEach(async function(aviso){
+          var fechita=await (aviso.Fecha).toDate()
+          aviso.Fecha = ''+ await fechita.getHours();
+          aviso.Fecha += ':'+ await fechita.getMinutes();
+          aviso.Fecha += ' / '+ await fechita.getDate();
+          aviso.Fecha += '-'+ await fechita.getMonth();
+          aviso.Fecha += '-' + await fechita.getFullYear();
+        });
+      },
+    },
+    mounted(){
+      this.recuperaAlertas();
     }
   }
 </script>

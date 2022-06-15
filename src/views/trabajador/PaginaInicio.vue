@@ -149,6 +149,11 @@
   var laRED;
   var elDISCO;
 
+  /** Vista encargada de proporcionar información gráfica de la propia máqina
+   * acerca de la última monitorización realizada
+  * @public
+  */
+
   export default{
     data (){
       
@@ -172,9 +177,15 @@
       BarraLateralSuperUsu
     },
     methods:{
+      /** Método encargado de realizar una actualización periódica de la información
+      * @public
+      */
       monitorizarPeriodico(){
         setInterval(this.monitorizaYAlmacena, 10000);  
       },
+      /** Método encargado de recoger la información modificada periódicamente
+      * @public
+      */
       async monitorizaYAlmacena(){
           
           var idEmpresa='';
@@ -203,7 +214,12 @@
 
 
 
-        }, //En este método vamos a obtener los datos de monitorización y a actualizar las gráficas
+        },
+        /** Método encargado procesar y preparar la información de monitorización
+         * para que sea mostrada de forma gráfica
+        * @public
+        * @param {Object} infoMonit Información recuperada de la base de datos que deberá ser procesada para ser mostrada de forma correcta
+        */
         descargaYMuestraMonitorizacion(infoMonit){
 
           console.log(infoMonit.get("CPU").currentLoad)

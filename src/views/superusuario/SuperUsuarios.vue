@@ -1,31 +1,28 @@
 <template>
 <v-main>
     <v-container app>
-   
     <v-card class="grey lighten-2">
     <v-container>
-      <v-card>SUPER USUARIOS</v-card>
-    </v-container>
-
-    <v-container>
-      <v-card class="black">{{recuperaSuperUsuarios}}
-        <v-row justify="right">
-          <v-col cols="5" md="8" >
-          </v-col>
-          <v-col cols="5" md="2" >
-          </v-col>
-          <v-col cols="5" md="1" >
-              <v-btn small dark class="green" @click="opcionBajaAlta(1)"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
-          </v-col>
-          <v-col cols="5" md="1" >
-            <v-btn small dark class="red" @click="opcionBajaAlta(2)"><v-icon>mdi-account-minus-outline</v-icon></v-btn> 
-          </v-col>
-          <v-col cols="5" md="1" >
-          </v-col>
+      <v-card class="black">
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
+          <v-row justify="right">
+            <v-col cols="5" md="8" >
+            </v-col>
+            <v-col cols="5" md="2" >
+            </v-col>
+            <v-col cols="5" md="1" >
+                <v-btn small dark class="green" @click="opcionBajaAlta(1)"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
+            </v-col>
+            <v-col cols="5" md="1" >
+              <v-btn small dark class="red" @click="opcionBajaAlta(2)"><v-icon>mdi-account-minus-outline</v-icon></v-btn> 
+            </v-col>
+            <v-col cols="5" md="1" >
+            </v-col>
           </v-row>
+        </v-img>
       </v-card>
-    </v-container>
-    <v-container id="regular-tables-view" fluid tag="section">
+   
+      <v-card>SUPER USUARIOS</v-card>
         <v-data-table  v-model="usuariosSeleccionados" :headers="headerUsuarios" :items="superusuarios" :single-select="true" item-key="Correo"   show-select class="elevation-1">
         <template v-slot:top>
         </template>
@@ -33,7 +30,7 @@
         <div class="py-3" />
     </v-container>
         
-    <v-container v-if="usuariosSeleccionados.Correo!==null"> 
+    <!--<v-container v-if="usuariosSeleccionados.Correo!==null"> 
         {{compruebaUsuarios()}}
     <v-row justify="center">
     <v-col cols="12" md="8">
@@ -71,7 +68,7 @@
     </v-col>
     </v-row>
     <div class="py-3" />
-    </v-container>
+    </v-container> -->
     </v-card>
 
        <!--DIÁLOGO MENSAJE DE CONFIRMACION DE BAJA-->
@@ -147,6 +144,11 @@ import { httpsCallable } from "firebase/functions";
 //Esto es para poder llamar a las funciones del backend
 const functions = getFunctions(firebaseApp);
 
+ /** Vista encargada de mostrar todos los super usuarios de la aplicación, proporcionará también la posibilidad
+  * de registrar y eliminar super usuarios del sistema
+  * @public
+  */
+
 export default{
    data (){
       return{
@@ -193,17 +195,10 @@ export default{
     components:{
       BarraLateralSuperUsu
     },
-    computed:{  
-      async recuperaSuperUsuarios(){
-        const firebaseDB= getFirestore(firebaseApp);
-        const consulta =  query(collection(firebaseDB, "SuperUsuarios"));
-        const querySnapshot = await getDocs(consulta);
-          querySnapshot.forEach((doc) => {
-            this.superusuarios.push(doc.data());
-          });
-      }
-    },
     methods:{
+         /** Método encargado de comprobar si hay algún super usuario seleccionado de la lista
+        * @public
+        */
         compruebaUsuarios(){
             console.log("Entro comprueba");
             if(!this.flagmodificandousuario){
@@ -222,6 +217,10 @@ export default{
                 }
             }
       },
+       /** Método encargado de dar de baja un super usuario del sistema, se llamará a la Cloud Functio correspondiente
+        * y se eliminará posteriormente su información de la base de datos
+        * @public
+        */
       async darDeBajaSuperUsuario(){
             const firebaseDB= getFirestore(firebaseApp);
 
@@ -247,6 +246,9 @@ export default{
                 this.flagexito=true;
             });
       },
+       /** Método encargado de recuperar para mostrar la información correspondiente a un superusuario seleccionado
+        * @public
+        */
       async GetDatosUsuario(){
         const firebaseDB= getFirestore(firebaseApp);
 
@@ -260,6 +262,11 @@ export default{
             this.imgurlUsuario=doc.get("URLImage");
           });
       },
+       /** Método encargado de reautenticar a un super usuario por medio de su contraseña previamente a realizar
+        * una alta o una baja de un super usuario dentro del sistema
+        * @public
+        * @param {Number} accion Nos indica si la acción que queremos realizar es un alta o una baja
+        */
       async reautenticarSuperUsuario(accion){
 
             this.error="";
@@ -300,6 +307,10 @@ export default{
                 this.error="Introduce la contraseña"
             }
       },
+         /** Método encargado de controlar si vamos a realizar una alta o una baja
+        * @public
+        * @param {Number} opcion Parámetro de control
+        */
         opcionBajaAlta(opcion){
           if(opcion==1){
             this.flagIntroducePass=true;
@@ -315,6 +326,9 @@ export default{
             }
           }
       },
+       /** Método encargado de restablecer los flags
+        * @public
+        */
       reseteaFlags(){
           this.error="";
           this.flagexito=false;
@@ -323,7 +337,21 @@ export default{
           this.boolalta=false;
           this.boolbaja=false;
           this.boolConfirmacionBaja=false;
+      },
+      /** Método encargado recuperar los usuarios que se encuentran registrados en la aplicación
+        * @public
+        */
+      async recuperaSuperUsuarios(){
+        const firebaseDB= getFirestore(firebaseApp);
+        const consulta =  query(collection(firebaseDB, "SuperUsuarios"));
+        const querySnapshot = await getDocs(consulta);
+          querySnapshot.forEach((doc) => {
+            this.superusuarios.push(doc.data());
+          });
       }
+    },
+    mounted(){
+      this.recuperaSuperUsuarios()
     }
 }
 </script>

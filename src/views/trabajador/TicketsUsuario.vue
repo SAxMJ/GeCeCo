@@ -3,28 +3,24 @@
   <v-container>
     <v-card class="grey lighten-2">
       <v-container>
-        <v-card>TICKETS DE INCIDENCIAS</v-card>
-      </v-container>
-
-      <v-container>
-        <v-card class="black">{{recuperaTickets}}
-        <v-row>
-        <v-col cols="5" md="8" >
-        </v-col>
-        <v-col cols="5" md="2" >
-        </v-col>
-        <v-col cols="5" md="1" >
-        </v-col>
-        <v-col cols="5" md="1" >
-          <v-btn small class="green" dark @click="dialog=true">+<v-icon>mdi-ticket</v-icon></v-btn> 
-        </v-col>
-        <v-col cols="5" md="1" >
-        </v-col>
-        </v-row>
+        <v-card class="black">
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
+            <v-row>
+            <v-col cols="5" md="8" >
+            </v-col>
+            <v-col cols="5" md="2" >
+            </v-col>
+            <v-col cols="5" md="1" >
+            </v-col>
+            <v-col cols="5" md="1" >
+              <v-btn small class="green" dark @click="dialog=true">+<v-icon>mdi-ticket</v-icon></v-btn> 
+            </v-col>
+            <v-col cols="5" md="1" >
+            </v-col>
+            </v-row>
+          </v-img>
         </v-card>
-      </v-container>
-
-       <v-container>
+        <v-card>TICKETS DE INCIDENCIAS</v-card>
       <v-data-table :headers="headers" :items="tickets" :single-select="true" item-key="Asunto"  class="elevation-1">
       <template v-slot:item.actions="{ item }">
           <v-icon medium class="mr-2" @click="modificarTicket(item)">mdi-pencil</v-icon>
@@ -136,6 +132,11 @@
 
   var rolUsr=1;
   console.log("Es--> " +rolUsr);
+
+  /** Vista que nos permitirá como usuarios normales tanto crear tickets de incidencia como modificar los que
+   * ya teníamos previamente creados.
+  * @public
+  */
   
   export default{
     data (){
@@ -166,29 +167,10 @@
       BarraLateralAdmin,
       BarraLateralSuperUsu
     },
-   computed:{ //Cada vez que inicializamos la paginarecogemos los datos
-      async recuperaTickets(){
-        const firebaseDB= getFirestore(firebaseApp);
-        const auth = getAuth();
-        const consulta =  query(collection(firebaseDB, "Tickets"), where("IdEmpleado", "==", auth.currentUser.uid));
-        const querySnapshot = await getDocs(consulta);
-        
-        querySnapshot.forEach((doc) => {
-          this.tickets.push(doc.data());
-          //this.fechas.push(doc.data('Fecha'));
-        });
-
-        this.tickets.forEach(async function(ticket){
-          var fechita=await (ticket.Fecha).toDate()
-          ticket.Fecha = ''+ await fechita.getHours();
-          ticket.Fecha += ':'+ await fechita.getMinutes();
-          ticket.Fecha += ' / '+ await fechita.getDate();
-          ticket.Fecha += '-'+ await fechita.getMonth();
-          ticket.Fecha += '-' + await fechita.getFullYear();
-        });
-      }
-    },
     methods:{
+      /** Método encargado crear y almacenar un nuevo ticket de incidencia en la base de datos
+       * @public
+       */
      async enviaTicket(){
         this.error='';
         const firebaseDB= getFirestore(firebaseApp);
@@ -227,6 +209,9 @@
           this.error="Hay campos vacíos";
         }
       },
+      /** Método encargado de actualizar la información del ticket en la base de datos de Firebase
+       * @public
+       */
       async actualizarTicket(){
         this.error='';
         const firebaseDB= getFirestore(firebaseApp);
@@ -252,18 +237,54 @@
         this.boolEditarTicket=false;
         this.flagExitoCrearTicket=true;
       },
+      /** Método encargado de tratar la información antigua del ticket que se va a modificar
+       * @public
+       * @param {Object} item Objeto con la información del ticket que va a modificarse
+       */
       modificarTicket(item){
         this.asuntoEditar=item.Asunto;
         this.descripcionEditar=item.Descripcion;
         this.asuntoAnterior=item.Asunto;
         this.boolEditarTicket=true;
       },
+      /** Método encargado de cerrar un diálogo de comunicación
+       * @public
+       */
       cerrarDialogo(){
         this.dialog=false;
       },
+      /** Método encargado de recargar la página tras la modificación o creación de un nuevo ticket de incidencia
+       * @public
+       */
       recargaPagina(){
         location.reload();
+      },
+      /** Método encargado de recuperar los tickts creados por el usuario en cuestión
+       * @public
+       */
+      async recuperaTickets(){
+        const firebaseDB= getFirestore(firebaseApp);
+        const auth = getAuth();
+        const consulta =  query(collection(firebaseDB, "Tickets"), where("IdEmpleado", "==", auth.currentUser.uid));
+        const querySnapshot = await getDocs(consulta);
+        
+        querySnapshot.forEach((doc) => {
+          this.tickets.push(doc.data());
+          //this.fechas.push(doc.data('Fecha'));
+        });
+
+        this.tickets.forEach(async function(ticket){
+          var fechita=await (ticket.Fecha).toDate()
+          ticket.Fecha = ''+ await fechita.getHours();
+          ticket.Fecha += ':'+ await fechita.getMinutes();
+          ticket.Fecha += ' / '+ await fechita.getDate();
+          ticket.Fecha += '-'+ await fechita.getMonth();
+          ticket.Fecha += '-' + await fechita.getFullYear();
+        });
       }
+    },
+    mounted(){
+      this.recuperaTickets();
     }
   }
 

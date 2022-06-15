@@ -3,10 +3,8 @@
   <v-container app>
     <v-card class="grey lighten-2">
       <v-container>
-        <v-card>USUARIOS DE LA EMPRESA</v-card>
-      </v-container>
-      <v-container>
-      <v-card class="black">{{recuperaIDEmpresaAdmin}}
+      <v-card class="black">
+        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
         <v-row>
           <v-col cols="5" md="8" >
           </v-col>
@@ -22,10 +20,10 @@
           <v-col cols="5" md="1" >
           </v-col>
         </v-row>
+         </v-img>
       </v-card>
-      </v-container>
-
-      <v-container id="regular-tables-view" fluid tag="section">
+     
+        <v-card>USUARIOS DE LA EMPRESA</v-card>
         <v-data-table  v-model="seleccionados" :headers="headers" :items="usuarios" :single-select="true" item-key="Correo" class="elevation-1">
 
         <template v-slot:item.actions="{ item }">
@@ -51,6 +49,12 @@
   import firebaseApp from '../../scripts/firebase'
   import { getAuth} from "firebase/auth";
   import {query, where, getDocs,addDoc} from "firebase/firestore";
+
+/** Ventana donde se muestran los diferentes trabajadores asociados a la misma empresa a la que se
+ * encuentra asociado el administrador
+* @public
+*/
+
   
   export default{
     data (){
@@ -79,21 +83,13 @@
       BarraLateralAdmin,
       BarraLateralSuperUsu
     },
-   computed:{ //Cada vez que inicializamos la paginarecogemos los datos
-      //Para el administrador los tickets recuperados serán todos aquellos que coincidan con su código de empresa 
-      async recuperaIDEmpresaAdmin(){
-      //Buscamos IdEmpresa de este administrador
-      const firebaseDB= getFirestore(firebaseApp);
-      const auth = getAuth();
-      const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
-      const querySnapshot = await getDocs(consulta);
-        querySnapshot.forEach((doc) => {
-          var IdEmp=doc.get("IdEmpresa")
-          this.recuperaTrabajadores(firebaseDB,IdEmp)
-        });
-      },
-    },
     methods:{
+    /** Método encargado de recuperar todos los trabajadores asociados a una empresa
+     * @public
+     * @param firebaseDB Instancia de la base de datos que nos permite trabajar con ella
+     * @param {string} IdEmp Id de la empresa correspondiente de la que queremos recuperar todos los
+     * trabajadores asociados
+    */
       async recuperaTrabajadores(firebaseDB,IdEmp){
         const consulta =  query(collection(firebaseDB, "Trabajadores"), where("IdEmpresa", "==", IdEmp));
         const querySnapshot = await getDocs(consulta);
@@ -103,10 +99,33 @@
         });
 
       },
+
+    /** Método encargado de acceder a la información de un empleado de la empresa
+     * @public
+     * @param {Object} usuario Objeto que contendrá información relevante que nos permitirá 
+     * indentificar al usuario para poder recuperar su información posteriormente.
+    */
       VerUsuario(usuario){
         console.log("usuario: "+usuario.Correo);
         this.$router.push('/verusuario/2/'+usuario.Correo);
-      }
+      },
+       /** Método encargado de recuperar el identificador de la empresa a la que pertenece el administrador
+    * @public
+    */
+    async recuperaIDEmpresaAdmin(){
+      //Buscamos IdEmpresa de este administrador
+      const firebaseDB= getFirestore(firebaseApp);
+      const auth = getAuth();
+      const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
+      const querySnapshot = await getDocs(consulta);
+        querySnapshot.forEach((doc) => {
+          var IdEmp=doc.get("IdEmpresa")
+          this.recuperaTrabajadores(firebaseDB,IdEmp)
+        });
+    }
+    },
+    mounted(){
+      this.recuperaIDEmpresaAdmin();
     }
   }
 

@@ -129,6 +129,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
     //Obtenemos el id de la empresa donde se ha producido la nueva monitorizacion
     var idEmpresa = (await admin.firestore().collection("Equipos").doc(rutaArchivo[1]).get()).data().IdEmpresa;
     var IdUsuario = (await admin.firestore().collection("Equipos").doc(rutaArchivo[1]).get()).data().IdUsuario;
+    var nombreEquipo = (await admin.firestore().collection("Equipos").doc(rutaArchivo[1]).get()).data().NombreEquipo;
     var IdEquipo = idEmpresa+""+IdUsuario;
 
     //Ahora vamos a recuperar la colección de alarmas del dicha empresa
@@ -158,7 +159,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                  ValorLimite: valor,
                  ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
                  Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                 Estado: "No resuelta"
+                 Estado: "No resuelta",
+                 NombreEquipo:nombreEquipo
                })
               }
             }
@@ -173,7 +175,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -192,7 +195,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -207,7 +211,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -226,7 +231,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -241,7 +247,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (snap.data().CPU.currentLoad*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -263,7 +270,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (snap.data().DISK[0].use*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -287,7 +295,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (porcDisp*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -313,7 +322,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (porcRamLibre*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -336,7 +346,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
                   ValorLimite: valor,
                   ValorObtenido: (porcRamUsada*1).toFixed(2),
                   Fecha: admin.firestore.FieldValue.serverTimestamp(),
-                  Estado: "No resuelta"
+                  Estado: "No resuelta",
+                  NombreEquipo:nombreEquipo
                 })
               }
             }
@@ -354,7 +365,8 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
               ValorLimite: valor,
               ValorObtenido: snap.data().PROCESOS,
               Fecha: admin.firestore.FieldValue.serverTimestamp(),
-              Estado: "No resuelta"
+              Estado: "No resuelta",
+              NombreEquipo:nombreEquipo
             })
           }
         }

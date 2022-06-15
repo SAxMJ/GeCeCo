@@ -163,6 +163,9 @@
   import { getAuth, updateProfile, reauthenticateWithCredential, updatePassword, EmailAuthProvider, } from "firebase/auth";
   import { getStorage, ref, getDownloadURL,uploadBytes } from "firebase/storage";
 
+  /** Vista del perfil de un usuario registrado en el sistema
+  * @public
+  */
 
   export default{
     data (){
@@ -264,6 +267,11 @@
       }
     },
     methods:{
+      /** Método encargado de comprobar cual ha sido la opción seleccionada a realizar por el usuario las opciones
+       * serán cambiar la foto de perfil o cambiar la contraseña.
+        * @public
+        * @param {Number} index Valor flag utilizado para seleccionar la acción en función de la opción seleccionada
+        */
       itemSeleccionado(index){
         if(index==0){
           this.cambiarFotoPerfil();
@@ -271,6 +279,9 @@
           this.boolCambiaPass=true;
         }
       },
+        /** Método encargado de modificar o restablecer la contraseña
+        * @public
+        */
         async restablecePass(){
 
           var auth=getAuth();
@@ -318,11 +329,17 @@
           }
         },
 
+        /** Método encargado de seleccionar una imagen
+        * @public
+        */
         imagenSeleccionada(evento){
           this.imagenSel=evento.target.files[0];
           console.log(this.imagenSel);
         },
 
+        /** Método encargado de subir una imagen y almacenarla en cloud
+        * @public
+        */
         async subirImagen(){
           
           if(!this.imagenSel){
@@ -355,11 +372,16 @@
           });
         
         },
-
+        /** Método encargado de iniciar el proceso de cambio de imagen de perfil
+        * @public
+        */
         cambiarFotoPerfil(){
           this.cambiarimagen=true
         },
 
+        /** Método encargado de actualizar la URL de la imagen de perfil del usuario
+        * @public
+        */
         async actualizarImagenEnBaseDeDatos(url){
           const firebaseDB= getFirestore(firebaseApp);
           const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", this.email));
