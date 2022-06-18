@@ -1,8 +1,8 @@
 <template>
-   <v-container fluid fill-height>
-      <v-layout align-center justify-center>
-         <v-flex xs12 sm8 md4>
-            <v-card>
+   <v-main>
+       <div>
+        <v-container class="grey lighten-4">
+            <v-card elevation="24" shaped tile>
                 <v-tabs v-model='tab' dark color="primary">
                   <v-tab href='#tabempresa'>Registrar empresa</v-tab>
                      <v-tab-item value='tabempresa'>
@@ -60,7 +60,9 @@
                             <v-card-text>
                                 <input @change="imagenSeleccionada($event)" type="file" accept="image/*">
                             </v-card-text>
-                            <v-btn color="green darken-1" text @click="subirImagen"><input value="SUBIR"></v-btn>
+                            <v-card-text >
+                                <v-btn color="green darken-1" text @click="subirImagen"><input value="SUBIR"></v-btn>
+                            </v-card-text>
                         </v-card>
 
                         <v-btn @click="nextTab" class="mt-4" dark color="secondary" value="registerEmp">Siguinte</v-btn>
@@ -106,9 +108,15 @@
                  </v-tabs>
                 </v-card>
                 <v-card>
+                <v-card-text class="trasparent">
+                <v-alert dense outlined type="error" v-if="error">
+                        {{error}}
+                </v-alert>
+                </v-card-text>
                 <v-card-text>Introduce los datos de la empresa</v-card-text>
-                <v-card-text>(Al registrar una empresa deberás registrar tambien  un administrador)</v-card-text>
+                <v-card-text>(Al registrar una empresa deberás registrar tambien  un administrador)</v-card-text>  
             </v-card>
+                
          </v-flex>
       </v-layout>
 
@@ -142,12 +150,14 @@
           </v-card>
       </template>
       </v-dialog> 
-
-   </v-container>
+    <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
+    </v-container>
+   </div>
+   </v-main>
 </template>
 
 <script>
-
+import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import {getFirestore, collection, addDoc} from "firebase/firestore"
 import firebaseApp from '../../scripts/firebase';
@@ -166,6 +176,7 @@ export default({
     
     data(){
       return{
+         rol: this.$route.params.rol,
          nombreEmp: '',
          direccion: '',
          localidad: '',
@@ -185,6 +196,9 @@ export default({
          urlphoto: "",
       }
    },
+    components:{
+      BarraLateralSuperUsu
+    },
     name: 'Registro',
     methods:{
         /** Método encargado de comprobar si se encuentra toda la información necesaria para añadir una nueva empresa

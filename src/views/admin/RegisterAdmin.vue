@@ -1,9 +1,9 @@
 <template>
-   <v-container fluid fill-height>
-      <v-layout align-center justify-center>
-         <v-flex xs12 sm8 md4>
-            <v-card elevation="24" shaped tile>
-              <!--DIÁLOGO DE REGISTRO DE UN USUARIO PARA UNA EMPRESA-->
+   <v-main>
+       <div>
+        <v-container class="grey lighten-4">
+         <v-card elevation="24" shaped tile>
+            <!--DIÁLOGO DE REGISTRO DE UN USUARIO PARA UNA EMPRESA-->
 
          <v-tabs dark color="primary">
             <v-tab>Registrar trabajador</v-tab>
@@ -30,9 +30,7 @@
             </v-tab-item>
           </v-tabs>
             </v-card>
-         </v-flex>
-      </v-layout>
-
+         
       <!--DIÁLOGO MENSAJE DE ÉXITO-->
       <v-dialog width="500" v-model="flagexito">
       <template>
@@ -49,7 +47,10 @@
       </v-dialog> 
    <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
    <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
+    
    </v-container>
+   </div>
+   </v-main>
 </template>
 
 <script>

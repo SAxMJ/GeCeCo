@@ -1,28 +1,35 @@
 <template>
 <v-main>
   <v-container app>
-    <v-card class="grey lighten-2">
+    <v-card class="grey lighten-4">
       <v-container>
-      <v-card class="black">
-        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
-          <v-row>
-          <v-col cols="5" md="8" >
-          </v-col>
-          <v-col cols="5" md="2" >
-          </v-col>
-          <v-col cols="5" md="1" >
-          </v-col>
-          <v-col cols="5" md="1" >
-            <v-btn small dark class="green" @click="boolNuevoEquipo=true"><v-icon>mdi-plus-box-outline</v-icon></v-btn> 
-          </v-col>
-          <v-col cols="5" md="1" >
-          </v-col>
-          </v-row>
-        </v-img>
-      </v-card>
-        <v-card>EQUIPOS DE LA EMPRESA</v-card>
-        <v-data-table  v-model="seleccionados" :headers="headers" :items="equipos" :single-select="true" item-key="IdEquipo" class="elevation-1">
 
+<v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">EQUIPOS DE LA EMPRESA</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-btn medium dark class="green" @click="boolNuevoEquipo=true"><v-icon>mdi-plus-box-outline</v-icon></v-btn> 
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
+
+        <v-data-table  v-model="seleccionados" :headers="headers" :items="equipos" :single-select="true" item-key="IdEquipo" class="elevation-1">
+          
         <template v-slot:item.actions="{ item }">
           <v-icon medium class="mr-2" @click="VerEquipo(item)">mdi-eye</v-icon>
         </template>
@@ -168,6 +175,7 @@
         var idNuevoEquipo=this.idEmpresa+""+this.idUsuarioNuevoEquipo;
 
         if(this.correoRegistroEquipo && this.nombreEquipo){
+          this.error="";
           try {
               
               //Creamos el nuevo documento de equipos
@@ -186,6 +194,8 @@
             } catch (e) {
               console.error("Error adding document: ", e);
             }
+        }else{
+          this.error="Debes rellenar ambos campos"
         }
       },
        /** Método encargado de recargar la página para visualizar los cambios realizados

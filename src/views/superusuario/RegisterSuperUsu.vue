@@ -1,7 +1,7 @@
 <template>
-   <v-container fluid fill-height>
-     <v-layout align-center justify-center>
-         <v-flex xs12 sm8 md4>
+   <v-main>
+       <div>
+        <v-container class="grey lighten-4">
             <v-card elevation="24" shaped tile>
               <!--DIÁLOGO DE REGISTRO DE UN USUARIO PARA UNA EMPRESA-->
          <v-tabs dark color="primary">
@@ -26,8 +26,6 @@
             </v-tab-item>
         </v-tabs>
             </v-card>
-         </v-flex>
-      </v-layout>
 
         <!--DIÁLOGO MENSAJE DE CONFIRMACION ALTA-->
       <v-dialog width="500" v-model="boolConfirmacionAlta">
@@ -60,13 +58,15 @@
           </v-card>
       </template>
       </v-dialog> 
-      
-   </v-container>
+       <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
+    </v-container>
+   </div>
+   </v-main>
 
 </template>
 
 <script>
-
+import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import {getFirestore, collection, addDoc} from "firebase/firestore"
 import firebaseApp from '../../scripts/firebase';
@@ -85,14 +85,18 @@ export default({
     
     data(){
       return{
+        rol: this.$route.params.rol,
          nombreSuper:"",
          apellidosSuper: "",
          correoSuper: "",
          passReautenticar:"",
          boolConfirmacionAlta:false,
          error:"",
+         flagexito:false,
       }
-   },
+   },components:{
+      BarraLateralSuperUsu
+    },
     name: 'Registro',
     methods:{
         /** Método encargado de registrar nuevos usuarios SuperUsuarios, se llamará a la Cloud Function correspondiente

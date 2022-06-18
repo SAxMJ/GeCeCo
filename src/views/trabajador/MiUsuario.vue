@@ -32,13 +32,13 @@
       </template>
   </v-dialog>
 <v-main>
-<v-container class="grey lighten-2">
-<v-card>MI USUARIO</v-card>
+<v-container class="grey lighten-4">
+<v-card class="blue lighten-3">MI USUARIO</v-card>
 <v-container id="user-profile-view" fluid tag="section">
     <v-row justify="center">
       <v-col cols="12" md="8">
         <v-card icon="mdi-account-outline" >  
-          <v-card class="black">{{GetDatosUsuario}}</v-card>
+          <v-card class="black">.</v-card>
           <v-form>
             <v-container class="py-0">
               <v-row>
@@ -200,72 +200,6 @@
       BarraLateralAdmin,
       BarraLateralSuperUsu
     },
-    computed:{
-      //Obtenemos los datos del ususario de firestore
-      async GetDatosUsuario(){
-        var auth = getAuth();
-        const firebaseDB= getFirestore(firebaseApp);
-        var codEmp;
-
-        if(this.rol!=3){ //Es un administrador o un usuario normal
-          //Buscamos el nombre, apellidos, email y empresas
-          const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
-          const querySnapshot = await getDocs(consulta);
-          querySnapshot.forEach((doc) => {
-            this.nombre=doc.get("Nombre");
-            this.apellidos=doc.get("Apellidos");
-            this.email=doc.get("Correo");
-            codEmp=doc.get("IdEmpresa")
-          });
-
-          //Buscamos el rol
-          const consulta2 =  query(collection(firebaseDB, "RolUser"), where("UID", "==", auth.currentUser.uid));
-          const querySnapshot2 = await getDocs(consulta2);
-          querySnapshot2.forEach((doc) => {
-            this.rolUser=doc.get("ROL");
-          });
-
-          //Buscamos el nombre de la empresa
-          const consulta3 =  query(collection(firebaseDB, "Empresas"), where("IdEmpresa", "==", codEmp));
-          const querySnapshot3 = await getDocs(consulta3);
-          querySnapshot3.forEach((doc) => {
-            this.empresa=doc.get("Nombre");
-          });
-        }
-        else{//Es un super usuario
-          //Buscamos el nombre, apellidos, email y empresas
-          const consulta =  query(collection(firebaseDB, "SuperUsuarios"), where("Correo", "==", auth.currentUser.email));
-          const querySnapshot = await getDocs(consulta);
-          querySnapshot.forEach((doc) => {
-            this.nombre=doc.get("Nombre");
-            this.apellidos=doc.get("Apellidos");
-            this.email=doc.get("Correo");
-            this.rolUser="SuperUsu";
-            this.empresa="GECECO"
-          });
-        }
-          //AHORA CARGAMOS LO REFERENTE A LA IMÁGEN DE PERFIL
-          
-          var photo;
-          var user=auth.currentUser;
-
-          if(user.photoURL){
-            photo = "FotosDeUsuarios/"+user.uid;
-          }else{
-            photo = "porDefecto.png"
-          }
-
-          //Vamos a recuperar la foto de perfil correspondiente al usuario
-          const storage = getStorage();
-          const imagesRef = ref(storage, photo);
-
-          //Con esta función obtenemos la url
-          await getDownloadURL(imagesRef).then((url)=>{
-            this.fotourl=url;
-          });
-
-      }
-    },
     methods:{
       /** Método encargado de comprobar cual ha sido la opción seleccionada a realizar por el usuario las opciones
        * serán cambiar la foto de perfil o cambiar la contraseña.
@@ -311,8 +245,6 @@
                 });
             }).catch(function(e){
               console.log(e);
-              //this.error = "La pass no es correcta";
-              //this.error='La contraseña introducida es incorrecta';
               errorcont="La contraseña antigua no es correcta";
             })
           }else{
@@ -393,8 +325,77 @@
           });
            location.reload();
         });
-          
+        },
+
+       /** Método encargado de recuperar la información correspondiente al usuario para mostrarla
+       * @public
+       */
+      async GetDatosUsuario(){
+        var auth = getAuth();
+        const firebaseDB= getFirestore(firebaseApp);
+        var codEmp;
+
+        if(this.rol!=3){ //Es un administrador o un usuario normal
+          //Buscamos el nombre, apellidos, email y empresas
+          const consulta =  query(collection(firebaseDB, "Trabajadores"), where("Correo", "==", auth.currentUser.email));
+          const querySnapshot = await getDocs(consulta);
+          querySnapshot.forEach((doc) => {
+            this.nombre=doc.get("Nombre");
+            this.apellidos=doc.get("Apellidos");
+            this.email=doc.get("Correo");
+            codEmp=doc.get("IdEmpresa")
+          });
+
+          //Buscamos el rol
+          const consulta2 =  query(collection(firebaseDB, "RolUser"), where("UID", "==", auth.currentUser.uid));
+          const querySnapshot2 = await getDocs(consulta2);
+          querySnapshot2.forEach((doc) => {
+            this.rolUser=doc.get("ROL");
+          });
+
+          //Buscamos el nombre de la empresa
+          const consulta3 =  query(collection(firebaseDB, "Empresas"), where("IdEmpresa", "==", codEmp));
+          const querySnapshot3 = await getDocs(consulta3);
+          querySnapshot3.forEach((doc) => {
+            this.empresa=doc.get("Nombre");
+          });
         }
+        else{//Es un super usuario
+          //Buscamos el nombre, apellidos, email y empresas
+          const consulta =  query(collection(firebaseDB, "SuperUsuarios"), where("Correo", "==", auth.currentUser.email));
+          const querySnapshot = await getDocs(consulta);
+          querySnapshot.forEach((doc) => {
+            this.nombre=doc.get("Nombre");
+            this.apellidos=doc.get("Apellidos");
+            this.email=doc.get("Correo");
+            this.rolUser="SuperUsu";
+            this.empresa="GECECO"
+          });
+        }
+          //AHORA CARGAMOS LO REFERENTE A LA IMÁGEN DE PERFIL
+          
+          var photo;
+          var user=auth.currentUser;
+
+          if(user.photoURL){
+            photo = "FotosDeUsuarios/"+user.uid;
+          }else{
+            photo = "porDefecto.png"
+          }
+
+          //Vamos a recuperar la foto de perfil correspondiente al usuario
+          const storage = getStorage();
+          const imagesRef = ref(storage, photo);
+
+          //Con esta función obtenemos la url
+          await getDownloadURL(imagesRef).then((url)=>{
+            this.fotourl=url;
+          });
+
+      }
+    },
+    mounted(){
+      this.GetDatosUsuario();
     }
 }
 </script>

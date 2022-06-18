@@ -1,17 +1,19 @@
 <template> <!-- @slot Barra de navegación con la que contarán los administradores para navegar por la aplicación-->
       <v-navigation-drawer app  :mini-variant.sync="mini" permanent class="secondary">
-        <v-card class="transparent">
-            <v-card-title class="justify-center" >
-              <v-img width="100" class="justify-center" src="../images/LogoTrasparente2.png">
-              </v-img>
-           </v-card-title>
-        </v-card>
+              
+      <v-card class="transparent">
+        <v-card-title class="justify-center" >
+          <v-list class=" align-center justify-center " width="130">           
+            <v-img width="130" src="../images/LogoTrasparente2.png"></v-img> 
+          </v-list>
+        </v-card-title>
+      </v-card>
+     
         <v-list-item class="px-2" dark>
           
           <v-list-item-avatar>
             <v-img :src="fotourl">
-            
-              
+
             </v-img>    
           </v-list-item-avatar>
         <v-list-item-title>ADMINISTRADOR</v-list-item-title>

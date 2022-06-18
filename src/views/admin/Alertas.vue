@@ -2,30 +2,37 @@
 <v-main>
 <div>
   <v-container>
-    <v-card class="grey lighten-2">
+    <v-card class="grey lighten-4">
       <v-container>
-      <v-card class="black">
-        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
-        <v-row>
-        <v-col cols="20" md="8" >
-        </v-col>
-        <v-col cols="20" md="9" >
-        </v-col>
-        <v-col cols="20" md="1" >
-          <v-btn small dark class="green" @click="boolNuevaAlerta=true"><v-icon medium>mdi-alert-plus</v-icon></v-btn>
-        </v-col>
-         <v-col cols="20" md="1" >
-          <v-btn small dark class="red" @click="compruebaAlertaSeleccionada(1)"><v-icon medium>mdi-alert-minus</v-icon></v-btn>
-        </v-col>
-        <v-col cols="20" md="1" >
-          <v-btn small dark class="orange" @click="compruebaAlertaSeleccionada(2)"><v-icon medium>mdi-pencil</v-icon></v-btn>
-        </v-col>
-        <v-col cols="20" md="1" >
-         </v-col>  
-        </v-row>
-        </v-img>
-      </v-card>
-         <v-card>ALERTAS CREADAS</v-card>
+
+<v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="3" md="3" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="5" md="5" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                        <v-card-text  class="text-h5 font-weight-bold white--text">ALERTAS CREADAS</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                        <v-btn small dark class="green" @click="boolNuevaAlerta=true"><v-icon medium>mdi-alert-plus</v-icon></v-btn>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                    <v-btn small dark class="red" @click="compruebaAlertaSeleccionada(1)"><v-icon medium>mdi-alert-minus</v-icon></v-btn>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                    <v-btn small dark class="orange" @click="compruebaAlertaSeleccionada(2)"><v-icon medium>mdi-pencil</v-icon></v-btn>
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
+
         <view-intro heading="Simple Tables" link="components/simple-tables"/>
         <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
         <v-data-table  v-model="alertaSeleccionada" :headers="cabeceras" :items="alertas" :single-select="true" item-key="IdAlerta" show-select class="elevation-1">
@@ -37,28 +44,33 @@
         <div class="py-3" />
       </v-container>
       
-      <v-container>
-        <v-card class="black">
-        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="https://lh3.googleusercontent.com/-Bc-8gs1FxX8/WGY0iAJ32II/AAAAAAAA9SM/sR1dlDV1Pdg/s1200/terminal-reduced.png">
-          <v-row>
-          <v-col cols="20" md="8" >
-          </v-col>
-          <v-col cols="20" md="9" >
-          </v-col>
-          <v-col cols="20" md="2" >
-          </v-col>
-          <v-col cols="20" md="1" >
-            <v-btn small dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
-          </v-col>
-          <v-col cols="20" md="1" >
-          </v-col>
-          <v-col cols="20" md="1" >
-          </v-col>
-          </v-row>
-        </v-img>
-      </v-card>
-     
-          <v-card>AVISOS DE ALERTAS</v-card>
+
+<v-container>
+  <v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">AVISOS DE ALERTAS</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                        <router-link to="/registeradmin/2">
+                          <v-btn medium dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
+                        </router-link>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
           <view-intro heading="Simple Tables" link="components/simple-tables"/>
           <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
           <v-data-table  v-model="avisoSeleccionados" :headers="cabecerasAvisos" :items="avisos" :single-select="true" item-key="IdAviso" show-select class="elevation-1">

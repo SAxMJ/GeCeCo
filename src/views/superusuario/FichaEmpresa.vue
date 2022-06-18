@@ -1,9 +1,9 @@
 <template>
 <v-main>
 <v-container>
-  <v-card class="grey lighten-2">
+  <v-card class="grey lighten-4">
      <v-container>
-        <v-card>FICHA DE LA EMPRESA</v-card>
+        <v-card class="blue lighten-3">FICHA DE LA EMPRESA</v-card>
       </v-container>
     <v-container>
       

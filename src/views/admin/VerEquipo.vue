@@ -1,10 +1,10 @@
 <template>
 <v-main > 
     <div>
+        <v-container class="grey lighten-4">
+        <v-card class="blue lighten-3">VER EQUIPO</v-card>
+        
         <v-container>
-        <v-card>VER EQUIPO</v-card>
-        <v-card class="black"></v-card>
-        <v-container class="grey lighten-2">
         <v-row rows="12" md="6">
             
             <v-col cols="12" md="2">
@@ -27,7 +27,7 @@
             <v-col cols="12" md="4">
                 <v-card width="600px" height="400px">
                 <v-container width="20" height="20">
-                    <v-card>{{nombreEquipoMuestra}}</v-card>
+                    <v-card class="blue lighten-4">{{nombreEquipoMuestra}}</v-card>
                     <v-card-title class="justify-center" >{{distro}}</v-card-title>
                     <v-card-text>{{platform}}</v-card-text>
                     <v-card-text>{{arch}}</v-card-text>
@@ -87,7 +87,7 @@
 
         <v-row rows="12" md="2">
             <v-container id="regular-tables-view" fluid tag="section">
-            <v-card>ALERTAS GENERADAS POR EL EQUIPO</v-card>
+            <v-card class="blue lighten-4">ALERTAS GENERADAS POR EL EQUIPO</v-card>
             <view-intro heading="Simple Tables" link="components/simple-tables"/>
             <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
             <v-data-table  :headers="cabecerasAvisos" :items="avisos" :single-select="true" item-key="IdAlerta"  class="elevation-1">
@@ -102,7 +102,7 @@
 
          <v-row rows="12" md="2">
             <v-container id="regular-tables-view" fluid tag="section">
-            <v-card>HISTORIAL DE LECTURAS</v-card>
+            <v-card class="blue lighten-4">HISTORIAL DE LECTURAS</v-card>
             <view-intro heading="Simple Tables" link="components/simple-tables"/>
             <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
             <v-data-table  :headers="cabecerasHistorico" :items="historicoMonit" :single-select="true" item-key="IdAlerta"  class="elevation-1">

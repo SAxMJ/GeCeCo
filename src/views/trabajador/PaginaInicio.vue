@@ -3,10 +3,10 @@
      <v-main > 
        <v-container app>
        {{monitorizarPeriodico()}}
-      <v-card class="grey lighten-2">
+      <v-card  class="grey lighten-4">
 
       <v-container>
-        <v-card>INFORMACIÓN DE ESTE EQUIPO</v-card>
+        <v-card class="blue lighten-3">INFORMACIÓN DE ESTE EQUIPO</v-card>
       </v-container>
 
       <v-row rows="6" md="6">
@@ -16,9 +16,9 @@
       </v-col>
     
       <v-col cols="12" md="3">
-        <v-card width="400px" height="425px">
+        <v-card width="400px" height="300px">
           <v-container width="20" height="20">
-            <v-card>CPU</v-card>
+            <v-card class="blue lighten-4">CPU</v-card>
                 <v-progress-circular
                   :size="50"
                   color="primary"
@@ -35,11 +35,11 @@
       </v-col>
 
        <v-col cols="12" md="3">
-       <v-card width="400px" height="425px">
+       <v-card width="400px" height="300px">
           <v-container width="20" height="20">
-            <v-card>RAM</v-card>
+            <v-card class="blue lighten-4">RAM</v-card>
             <v-progress-circular
-            :width="3"
+            :size="50"
             color="red"
             indeterminate
             v-show="boolcarga===true"
@@ -59,12 +59,12 @@
       </v-col>
       
        <v-col cols="18" md="3">
-        <v-card width="400px" height="425px">
+        <v-card width="400px" height="300px">
           <v-container width="20" height="20">
-            <v-card>Disco</v-card>
+            <v-card class="blue lighten-4">Disco</v-card>
             <v-progress-circular
-            :size="70"
-            :width="7"
+            
+            :size="50"
             color="purple"
             indeterminate
             v-show="boolcarga===true"
@@ -75,10 +75,9 @@
       </v-col>
         
       <v-col cols="18" md="4">
-        <v-card width="550px" height="425px">
+        <v-card width="550px" height="300px">
           <v-container width="20" height="20">
-            <v-card>Info Sistema</v-card>
-              <v-card-text></v-card-text>
+            <v-card class="blue lighten-4">Info Sistema</v-card>
               <v-card-title class="justify-center">{{distro}}</v-card-title>
               <v-card-text>{{platform}}</v-card-text>
               <v-card-text>{{arch}}</v-card-text>
@@ -95,9 +94,9 @@
       </v-col>
        
        <v-col cols="18" md="3">
-        <v-card width="400px" height="425px">
+        <v-card width="400px" height="300px">
           <v-container width="20" height="20" >
-            <v-card>Red</v-card>
+            <v-card class="blue lighten-4">Red</v-card>
              <v-progress-circular
               :size="50"
               color="amber"

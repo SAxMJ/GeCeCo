@@ -2,11 +2,11 @@
 <v-main>
 <v-container app>
 <v-card>
-<v-container class="grey lighten-2">
-  <v-card>FICHA DE USUARIO</v-card>
+<v-container class="grey lighten-4">
+  <v-card class="blue lighten-3">FICHA DE USUARIO</v-card>
     <v-container id="user-profile-view" fluid tag="section">
         <v-card icon="mdi-account-outline">
-          <v-card class="black"></v-card>
+          <v-card class="black">.</v-card>
           <v-form>
             <v-container class="py-0">
               <v-row align-content-center>

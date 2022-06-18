@@ -1,28 +1,38 @@
 <template>
-<v-main>
+<v-main permanent>
     <v-container app>
-    <v-card class="grey lighten-2">
+    <v-card class="grey lighten-4">
     <v-container>
-      <v-card class="black">
-        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
-          <v-row justify="right">
-            <v-col cols="5" md="8" >
-            </v-col>
-            <v-col cols="5" md="2" >
-            </v-col>
-            <v-col cols="5" md="1" >
-                <v-btn small dark class="green" @click="opcionBajaAlta(1)"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
-            </v-col>
-            <v-col cols="5" md="1" >
-              <v-btn small dark class="red" @click="opcionBajaAlta(2)"><v-icon>mdi-account-minus-outline</v-icon></v-btn> 
-            </v-col>
-            <v-col cols="5" md="1" >
-            </v-col>
-          </v-row>
-        </v-img>
-      </v-card>
+      
+      
+      <v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="6" md="6" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">SUPER USUARIOS</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                <v-btn medium dark class="green" @click="opcionBajaAlta(1)"><v-icon>mdi-account-plus-outline</v-icon></v-btn> 
+                      </v-card>
+                  </v-col>
+
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+              <v-btn medium dark class="red" @click="opcionBajaAlta(2)"><v-icon>mdi-account-minus-outline</v-icon></v-btn> 
+                      </v-card>
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
    
-      <v-card>SUPER USUARIOS</v-card>
         <v-data-table  v-model="usuariosSeleccionados" :headers="headerUsuarios" :items="superusuarios" :single-select="true" item-key="Correo"   show-select class="elevation-1">
         <template v-slot:top>
         </template>
@@ -97,7 +107,7 @@
               <v-card-text>
                 <v-text>Se realizó con éxito</v-text>
               </v-card-text>
-              <v-btn color="green darken-1" text @click="reseteaFlags">ACEPTAR</v-btn>
+              <v-btn color="green darken-1" text @click="recargaPagina">ACEPTAR</v-btn>
           </v-card>
       </template>
       </v-dialog> 
@@ -348,7 +358,13 @@ export default{
           querySnapshot.forEach((doc) => {
             this.superusuarios.push(doc.data());
           });
-      }
+      },
+       /** Método encargado de recargar la página para visualizar los cambios realizados
+        * @public
+       */
+      recargaPagina(){
+         location.reload();
+      },
     },
     mounted(){
       this.recuperaSuperUsuarios()

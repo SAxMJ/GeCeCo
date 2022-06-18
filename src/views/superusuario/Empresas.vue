@@ -1,28 +1,35 @@
 <template>
 <v-main>
 <v-container app>
-    <v-card class="grey lighten-2">
+    <v-card class="grey lighten-4">
       <v-container>
-        <v-card class="black">
-        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
-            <v-row>
-            <v-col cols="5" md="8" >
-            </v-col>
-            <v-col cols="5" md="2" >
-            </v-col>
-            <v-col cols="5" md="1" >
-            </v-col>
-            <v-col cols="5" md="1" >
-              <router-link to="/registerempresa/3">
-                <v-btn small dark class="green"><v-icon medium>mdi-home-plus-outline</v-icon></v-btn>
-              </router-link>
-            </v-col>
-            <v-col cols="5" md="1" >
-            </v-col>
-            </v-row>
-          </v-img>
-        </v-card>
-        <v-card>EMPRESAS</v-card>
+
+        <v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">EMPRESAS</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                        <router-link to="/registerempresa/3">
+                          <v-btn medium dark class="green"><v-icon medium>mdi-home-plus-outline</v-icon></v-btn>
+                        </router-link>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
+
           <v-data-table  v-model="seleccionados" :headers="headers" :items="empresas" :single-select="true" item-key="IdEmpresa"  class="elevation-1">
           <template v-slot:top>
           </template>
@@ -87,7 +94,9 @@
         this.$router.push('/fichaempresa/3/'+empresa.IdEmpresa);
       },
       
-      /** Método encargado de recuperar las empresas que se encuentran registradas en el sistema */
+       /** Método encargado de recuperar las empresas que se encuentran registradas en el sistema
+       * @public
+       */
       async recuperaEmpresas(){
       const firebaseDB= getFirestore(firebaseApp);
       const consulta =  query(collection(firebaseDB, "Empresas"));

@@ -1,7 +1,7 @@
 <template>
-   <v-container fluid fill-height>
-      <v-layout align-center justify-center >
-         <v-flex xs12 sm8 md4>
+    <v-main align-baseline justify-center>
+       <div align-center justify-center>
+        <v-container class="grey lighten-4">
             <v-card elevation="24" shaped tile>
                <v-tabs dark color="primary">
                   <v-tab >RECUPERAR CONTRASEÑA</v-tab>
@@ -9,12 +9,7 @@
                      <v-card>
                         <v-card-text>
                            <form>
-                                <v-text-field
-                                 label="Introduce tu correo asociado"
-                                 solo
-                                 readonly
-                                 centered
-                              ></v-text-field>
+                                <v-card-text>INTRODCE TU DIRECCIÓN DE CORREO</v-card-text>
                               <v-text-field
                                  v-model="correo"
                                  name="email"
@@ -43,13 +38,13 @@
                             {{mensajeenviado}}
                             </v-alert>
                         </v-card-text>
-                        <v-btn color="green darken-1" text @click="enviado = false">Aceptar</v-btn>
+                        <v-btn color="green darken-1" text @click="volverAlLogin">Aceptar</v-btn>
                     </v-card>
                 </template>
             </v-dialog>
-         </v-flex>
-      </v-layout>
    </v-container>
+   </div>
+   </v-main>
 </template>
 
 <script>
@@ -91,7 +86,13 @@ export default({
             }else{
                 this.error='Introduce tu email'
             }
-        }
+        },
+        /** Método encargado de voler a la vista de SuperUsuarios tras el registro del nuevo SuperUsuario
+        * @public
+        */
+      volverAlLogin(){
+         this.$router.push('/login');
+      },
     }
 })
 

@@ -1,35 +1,38 @@
 <template>
 <v-main>
   <v-container app>
-    <v-card  class="grey lighten-2">
+    <v-card  class="grey lighten-4">
       <v-container>
-        <v-img height="100" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-end" src="../../images/adornoTerminal.jpg">
-        <v-row>
-        <v-col cols="5" md="8" >
-        </v-col>
-        <v-col cols="5" md="2" >
-        </v-col>
-        <v-col cols="5" md="1" >
-          <v-btn small dark class="green" @click="comprobarSeleccionados(0)"><v-icon>mdi-check</v-icon></v-btn>
-        </v-col>
-        <v-col cols="5" md="1" >
-           <v-btn small dark class="red" @click="comprobarSeleccionados(1)"><v-icon>mdi-delete</v-icon></v-btn>
-        </v-col>
-        <v-col cols="5" md="1" >
-        </v-col>
-        </v-row>
-        </v-img>
-      
-      <v-card>TICKETS DE LA EMPRESA</v-card>
-      <v-data-table v-model="seleccionados" :headers="headers" :items="tickets" :single-select="singleSelect" item-key="Asunto" show-select class="elevation-1">
-      <template v-slot:top>
-        <v-switch
-          v-model="singleSelect"
-          label="Single select"
-          class="pa-3"
-        ></v-switch>
-      </template>
-      </v-data-table>
+      <v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="6" md="6" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">TICKETS DE LA EMPRESA</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                        <v-btn medium dark class="green" @click="comprobarSeleccionados(0)"><v-icon>mdi-check</v-icon></v-btn>
+                      </v-card>
+                  </v-col>
+
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                        <v-btn medium dark class="red" @click="comprobarSeleccionados(1)"><v-icon>mdi-delete</v-icon></v-btn>
+                      </v-card>
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
+
+        <v-data-table v-model="seleccionados" :headers="headers" :items="tickets" :single-select="singleSelect" item-key="Asunto" show-select class="elevation-1">
+        </v-data-table>
 
     </v-container>
     </v-card>
@@ -78,7 +81,35 @@
         </template>
         </v-dialog> 
 
+        
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
   </v-container>
