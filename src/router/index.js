@@ -7,6 +7,7 @@ import { getFirestore,collection, query, where, getDocs, onSnapshot  } from "fir
 
 Vue.use(VueRouter)
 
+
 const routes = [
   //Para cualquier URL mal formada, redireccionaré al login
   {
@@ -128,7 +129,7 @@ router.beforeEach((to,from,next)=>{
     onAuthStateChanged(auth, (user) => {
       //Si hay sesión de usurio lo que haremos será comprobar el rol que tiene el usuario y en función de eso le enviaremos con la informacion
       //de rol correspondiente
-      if (user) {        
+      if (user) {    
         getRol(to,next,user);
       }
       else if(to.path=='/'){
@@ -147,6 +148,7 @@ router.beforeEach((to,from,next)=>{
 function getRol(to,next,user){
           var rol=1;
           //vuewait.start("Esperando");
+          
           const firebaseDB= getFirestore(firebaseApp);  
           //Recordar que la , en mongo era como un and
           const consulta =  query(collection(firebaseDB, "RolUser"), where("Correo", "==", user.email), where("ROL", "==", "Admin"));

@@ -21,9 +21,11 @@
                                  <v-btn @click="enviarMail" class="mt-4"  dark color="secondary" value="login">ENVIAR</v-btn>
                            </form>
                         </v-card-text>
-                        <v-alert dense outlined type="error" v-if="error">
+                         <v-card-text>
+                           <v-alert dense outlined type="error" v-if="error">
                               {{error}}
-                        </v-alert>
+                           </v-alert>
+                           </v-card-text>
                      </v-card>
                      </v-tab-item>
                </v-tabs>

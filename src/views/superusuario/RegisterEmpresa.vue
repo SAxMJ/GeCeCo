@@ -2,6 +2,30 @@
    <v-main>
        <div>
         <v-container class="grey lighten-4">
+
+ <v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">REGISTRO DE EMPRESA</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
+
             <v-card elevation="24" shaped tile>
                 <v-tabs v-model='tab' dark color="primary">
                   <v-tab href='#tabempresa'>Registrar empresa</v-tab>
@@ -117,8 +141,6 @@
                 <v-card-text>(Al registrar una empresa deberás registrar tambien  un administrador)</v-card-text>  
             </v-card>
                 
-         </v-flex>
-      </v-layout>
 
         <!--DIÁLOGO DE CONFIRMACIÓN DE BAJA DE USUARIO-->
       <v-dialog width="500" v-model="flagregistraempresa">
@@ -150,6 +172,23 @@
           </v-card>
       </template>
       </v-dialog> 
+
+       <!--DIÁLOGO MENSAJE DE ERROR-->
+      <v-dialog width="500" v-model="boolExistente">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-alert dense outlined type="error">ERROR</v-alert>
+              </v-card-title>
+              <v-card-text>
+                  <v-text >La empresa ya existe dentro del sistema</v-text>
+
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="boolExistente=false">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog> 
+
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
     </v-container>
    </div>
@@ -159,7 +198,7 @@
 <script>
 import BarraLateralSuperUsu from '../../components/BarraLateralSuperUsu.vue'
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import {getFirestore, collection, addDoc} from "firebase/firestore"
+import {getFirestore, collection, addDoc, getDoc, query, where, getDocs} from "firebase/firestore"
 import firebaseApp from '../../scripts/firebase';
 import { httpsCallable } from "firebase/functions";
 import { getFunctions } from "firebase/functions"
@@ -176,24 +215,24 @@ export default({
     
     data(){
       return{
-         rol: this.$route.params.rol,
-         nombreEmp: '',
-         direccion: '',
-         localidad: '',
-         cp: '',
-         dedicacion: '',
-         error: '',
-         nombre:'',
-         apellidos: '',
-         correo:'',
+        rol: this.$route.params.rol,
+        nombreEmp: '',
+        direccion: '',
+        localidad: '',
+        cp: '',
+        dedicacion: '',
+        error: '',
+        nombre:'',
+        apellidos: '',
+        correo:'',
+        boolExistente:false,
+        tab:'tabempresa',
+        flagregistraempresa:false,
+        flagexito:false,
+        flaghayfoto: false,
 
-         tab:'tabempresa',
-         flagregistraempresa:false,
-         flagexito:false,
-         flaghayfoto: false,
-
-         imagenSel: null,
-         urlphoto: "",
+        imagenSel: null,
+        urlphoto: "",
       }
    },
     components:{
@@ -225,18 +264,31 @@ export default({
         * @public
         */
         async registraEmpresa(){
-            
-            var password=generarPassword();
-            var idEmp= generaIdEmpresa();
-            const firebaseDB= getFirestore(firebaseApp);
+            var existe="0";
 
-            //Añadimos el nuevo administrador a RolUser y lo registramos en el sistema
-            const registrarTrabajador=httpsCallable(functions,"registrarTrabajador");
-               registrarTrabajador({usuario: this.correo, pass: password}).then(async(resultado)=> {
-         
+            const firebaseDB= getFirestore(firebaseApp);
+            const consulta =  query(collection(firebaseDB, "Empresas"), where("Nombre", "==", this.nombreEmp));
+            const querySnapshot = await getDocs(consulta);
+
+            querySnapshot.forEach(async(doc) => {
+                existe="1"
+            });
+            
+            if(existe=="1"){
+                console.log("La empresa ya existe")
+                this.boolExistente=true;
+            }else{
+                var password=generarPassword();
+                var idEmp= generaIdEmpresa();
+                
+
+                //Añadimos el nuevo administrador a RolUser y lo registramos en el sistema
+                const registrarTrabajador=httpsCallable(functions,"registrarTrabajador");
+                registrarTrabajador({usuario: this.correo, pass: password}).then(async(resultado)=> {
+            
                     console.log("ELUIDDDD es "+resultado.data);
                     await sendPasswordResetEmail(getAuth(),this.correo);
-                     //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
+                    //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
                     try {
                         const docRef =  await addDoc(collection(firebaseDB, "RolUser"), {
                         ROL: "Admin",
@@ -248,19 +300,26 @@ export default({
                     //console.error("Error adding document: ", e);
                     }
 
+                    const stg=getStorage();
+                    var imgRef=ref(stg,'porDefecto.png');
+
+                     await getDownloadURL(imgRef).then(async(url)=>{
                     //AÑADIMOS EL NUEVO ADMIN A LA BASE DE DATOS DE TRABAJADORES
-                    try {
-                        const docRef =  await addDoc(collection(firebaseDB, "Trabajadores"), {
-                        Nombre: this.nombre,
-                        Apellidos: this.apellidos,
-                        Correo: this.correo,
-                        IdEmpresa: idEmp,
-                        ROL: "Admin"
-                        });
-                        //console.log("Document written with ID: ", docRef.id);
-                    } catch (e) {
-                        //console.error("Error adding document: ", e);
-                    }
+                        try {
+                            const docRef =  await addDoc(collection(firebaseDB, "Trabajadores"), {
+                            Nombre: this.nombre,
+                            Apellidos: this.apellidos,
+                            Correo: this.correo,
+                            IdEmpresa: idEmp,
+                            ROL: "Admin",
+                            UID: resultado.data,
+                            URLImage: url,
+                            });
+                            //console.log("Document written with ID: ", docRef.id);
+                        } catch (e) {
+                            //console.error("Error adding document: ", e);
+                        }
+                     });
 
                     //En el caso de que haya foto, entonces primero subimos la foto y luego generamos la url para subir la empresa a base de datos con la url
                         const storage=getStorage();
@@ -280,7 +339,7 @@ export default({
                             //Vamos a recuperar la foto de perfil correspondiente al usuario
                             imagesRef = ref(storage, photo);
                         }else{
-                            imagesRef=ref(storage,'empresaPorDefecto');
+                            imagesRef=ref(storage,'empresaPorDefecto.png');
                         }
                         //Con esta función obtenemos la url
                         await getDownloadURL(imagesRef).then(async(url)=>{
@@ -303,8 +362,8 @@ export default({
 
                     this.flagregistraempresa=false;
                     this.flagexito=true;
-               });
-
+                });
+                }   
         },
         /** Método encargado de recargar la página tras el registro de una nueva empresa en el sistema
         * @public
@@ -331,7 +390,8 @@ export default({
           
           this.flaghayfoto=true;
         }
-    }
+    },
+    
 })
 
 //Función encargada de generar una contraseña de 10 caracteres aleatorios

@@ -25,17 +25,22 @@ const app=admin.initializeApp(firebaseConfig);
 */
 exports.registrarTrabajador=functions.https.onCall(async(data, context) => {
   
-  var elUID;
+  var elUID="0";
   await admin.auth().createUser({email: data.usuario, password: data.pass}).then(async(userRecord) => {
     elUID=userRecord.uid;
     console.log("ElUID1"+elUID);
   }).catch((error) => {
       console.log('Error al crear el nuevo usuario', error);
+      return "0";
   });
-  console.log("ELUID2"+elUID)
-  return ""+elUID;
-});
 
+  if(elUID=="0"){
+    return "0"
+  }else{
+    console.log("ELUID2"+elUID)
+    return ""+elUID;
+  }
+});
 
 
 
@@ -143,7 +148,7 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
         valor=doc.data().Valor;
         tipo=doc.data().Tipo;
         idAdmin=doc.data().IdAdmin;
-
+  
         if(tipo=="CPU"){
 
           if(tipoElemento=="Carga"){
@@ -369,6 +374,25 @@ exports.newMonitor = functions.firestore.document('Equipos/{idEmpresaUsuario}/Mo
               NombreEquipo:nombreEquipo
             })
           }
+        }
+        if(tipo=="SERVICIOS"){
+          for(var seleccionado in snap.data().SERVICIOS){
+            //Si el tipo de servicio de  lo que monitoriza la alerta es ese servicio y ese servicio viene apagado, se genera el aviso
+            if(snap.data().SERVICIOS[seleccionado].name==tipoElemento && snap.data().SERVICIOS[seleccionado].running==false){
+              await admin.firestore().collection("AvisosDeAlerta").doc(idAdmin+""+IdEquipo+""+tipo+"").set({
+                IdAdmin: idAdmin,
+                IdEquipo: IdEquipo,
+                Tipo: tipo,
+                TipoElemento: tipoElemento,
+                ValorLimite: "false",
+                ValorObtenido: "false",
+                Fecha: admin.firestore.FieldValue.serverTimestamp(),
+                Estado: "No resuelta",
+                NombreEquipo:nombreEquipo,
+                Limite:"-"
+              })
+            } 
+        }
         }
 
       });

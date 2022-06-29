@@ -33,7 +33,28 @@
   </v-dialog>
 <v-main>
 <v-container class="grey lighten-4">
-<v-card class="blue lighten-3">MI USUARIO</v-card>
+ <v-container fluid pa-0>
+      <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+        <v-row align="center" justify="center" 
+            style="height:100vh" dense>
+            <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card flat tile>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card class="transparent" flat tile>
+                    <v-card-text  class="text-h5 font-weight-bold white--text">MI USUARIO</v-card-text>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card class="transparent" flat tile>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+            </v-col>
+        </v-row>
+      </v-img>
+  </v-container>
 <v-container id="user-profile-view" fluid tag="section">
     <v-row justify="center">
       <v-col cols="12" md="8">
@@ -91,7 +112,7 @@
 
                 <v-dialog v-model="dialog" persistent max-width="290">
                   <v-card align-content-center>
-                    <v-card-title class="text-h5">
+                    <v-card-title class="text-h5 justify-center">
                       ¿Estás seguro?
                     </v-card-title>
                     <v-card-text>Se restablecerá tu contraseña</v-card-text>
@@ -112,7 +133,7 @@
       <v-col cols="12" md="4" >
         <v-card class="mt-4 text-center">
           <v-card class="black">a</v-card>
-          <v-img class="rounded-circle elevation-6 mt-n12 d-inline-block" :src="fotourl" width="128" />
+          <v-img class="rounded-circle elevation-6 d-inline-block" :src="fotourl" width="128" height="128" />
             <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon color="black" dark v-bind="attrs" v-on="on"><v-icon dark>mdi-cog</v-icon></v-btn>

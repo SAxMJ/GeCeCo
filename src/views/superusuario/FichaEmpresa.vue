@@ -2,23 +2,32 @@
 <v-main>
 <v-container>
   <v-card class="grey lighten-4">
-     <v-container>
-        <v-card class="blue lighten-3">FICHA DE LA EMPRESA</v-card>
-      </v-container>
+      
     <v-container>
       
-      <v-row justify="center">
-        
-      <v-col cols="12" md="8">
-        <v-row>
-          <v-col cols="12" md="0">
-          </v-col>
-          <v-col cols="12" md="12">
-            <v-card class="black"></v-card>
-          </v-col>
-      </v-row>
         <v-card icon="mdi-account-outline">  
-          <v-card class="black"></v-card>
+          <v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">FICHA DE LA EMPRESA</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
           <v-container>
           <v-form>
             <v-container class="py-0">
@@ -31,7 +40,7 @@
                   <v-text-field color="black" label="Dedicación" v-model= "dedicacion" readonly />
                 </v-col>
 
-                <v-col align-content-space- cols="12" md="4">
+                <v-col align-content-space- cols="12" md="3">
                   <v-img align-center max-height="100" max-width="100" :src="imgurl"></v-img>
                   <v-menu offset-y>
                   <template v-slot:activator="{ on, attrs }">
@@ -68,8 +77,6 @@
           </v-form>
           </v-container>
         </v-card>
-      </v-col>
-      </v-row>
       </v-container>
 
       <!--DIÁLOGO DE REGISTRO DE UN USUARIO PARA UNA EMPRESA-->
@@ -143,6 +150,22 @@
       </template>
       </v-dialog> 
 
+      <!--DIÁLOGO MENSAJE DE ERROR-->
+      <v-dialog width="500" v-model="boolExistente">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-alert dense outlined type="error">ERROR</v-alert>
+              </v-card-title>
+              <v-card-text>
+                  <v-text >Ya existe un usuario con este email asociado</v-text>
+
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="boolExistente=false">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog> 
+
     </v-card>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
 
@@ -186,6 +209,8 @@ const functions = getFunctions(firebaseApp);
         localidad: "",
         nombre: "",
         imgurl: "",
+        boolExistente:false,
+
 
          opciones:[
           {title: 'Nuevo trabajador'},
@@ -258,8 +283,10 @@ const functions = getFunctions(firebaseApp);
             if(this.nombretrabajador && this.apellidotrabajador && this.correotrabajador && password){
                this.error=''; //Limpiamos el mensaje de error
 
-               const registrarTrabajador=httpsCallable(functions,"registrarTrabajador");
-               registrarTrabajador({usuario: this.correotrabajador, pass: password}).then(async(resultado)=> {
+              
+              const registrarTrabajador=httpsCallable(functions,"registrarTrabajador");
+              registrarTrabajador({usuario: this.correotrabajador, pass: password}).then(async(resultado)=> {
+                    if(resultado.data != "0"){
                      console.log("ELUIDDDD es "+resultado.data);
                      await sendPasswordResetEmail(getAuth(),this.correotrabajador);
                      //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
@@ -274,27 +301,31 @@ const functions = getFunctions(firebaseApp);
                         console.error("Error adding document: ", e);
                         }
                     //AÑADIMOS EL NUEVO ADMIN A LA BASE DE DATOS DE TRABAJADORES
-                    const storage=getStorage();
-                    imagesRef= ref(storage,'porDefecto.png');
+                      const storage=getStorage();
+                      imagesRef= ref(storage,'porDefecto.png');
 
-                    await getDownloadURL(imagesRef).then(async(url)=>{
-                      try {
-                          const docRef =  await addDoc(collection(firebaseDB, "Trabajadores"), {
-                          Nombre: this.nombretrabajador,
-                          Apellidos: this.apellidotrabajador,
-                          Correo: this.correotrabajador,
-                          IdEmpresa: this.idempresa,
-                          ROL: this.rolregistro,
-                          URLImage: url
-                          });
-                          console.log("Document written with ID: ", docRef.id);
-                          this.flagexito=true;
-                          
-                      } catch (e) {
-                          console.error("Error adding document: ", e);
-                      }
-                    });
+                      await getDownloadURL(imagesRef).then(async(url)=>{
+                        try {
+                            const docRef =  await addDoc(collection(firebaseDB, "Trabajadores"), {
+                            Nombre: this.nombretrabajador,
+                            Apellidos: this.apellidotrabajador,
+                            Correo: this.correotrabajador,
+                            IdEmpresa: this.idempresa,
+                            ROL: this.rolregistro,
+                            URLImage: url
+                            });
+                            console.log("Document written with ID: ", docRef.id);
+                            this.flagexito=true;
+                            
+                        } catch (e) {
+                            console.error("Error adding document: ", e);
+                        }
+                      });
+                    }else{
+                      this.boolExistente=true;
+                    }
                });
+              
             }
             else{
               this.error='Faltan datos por añadir al formulario'

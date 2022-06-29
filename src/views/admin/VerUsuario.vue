@@ -3,10 +3,30 @@
 <v-container app>
 <v-card>
 <v-container class="grey lighten-4">
-  <v-card class="blue lighten-3">FICHA DE USUARIO</v-card>
     <v-container id="user-profile-view" fluid tag="section">
+      <v-container fluid pa-0>
+      <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+        <v-row align="center" justify="center" 
+            style="height:100vh" dense>
+            <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card flat tile>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card class="transparent" flat tile>
+                    <v-card-text  class="text-h5 font-weight-bold white--text">USUARIO</v-card-text>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card class="transparent" flat tile>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+            </v-col>
+        </v-row>
+      </v-img>
+  </v-container>
         <v-card icon="mdi-account-outline">
-          <v-card class="black">.</v-card>
           <v-form>
             <v-container class="py-0">
               <v-row align-content-center>
@@ -14,7 +34,7 @@
                   <v-text-field color="black" label="Nombre" v-model= "nombre" readonly />
                 </v-col> 
 
-                <v-col cols="12" md="4">
+                <v-col cols="12" md="3">
                   <v-text-field color="black" label="Apellidos" v-model= "apellidos" readonly />
                 </v-col>
 
@@ -107,7 +127,7 @@
       <!--DIÁLOGO DE MODIFICACION DE UN USUARIO PARA UNA EMPRESA-->
       <v-dialog width="700" v-model="flagmodificandousuario">
       <v-card>
-        <v-card-title>MODIFICAR TRABAJADOR</v-card-title>
+        <v-card-title class="justify-center">MODIFICAR TRABAJADOR</v-card-title>
         <v-card-text>
           <v-form>
             <v-container class="py-0">

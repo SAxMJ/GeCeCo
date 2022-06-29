@@ -61,9 +61,7 @@
                   </v-col>
                   <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
                       <v-card class="transparent" flat tile>
-                        <router-link to="/registeradmin/2">
                           <v-btn medium dark class="green" @click="comprobarSeleccionados"><v-icon>mdi-check</v-icon></v-btn> 
-                        </router-link>
                       </v-card>
                   </v-col>
                   <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
@@ -91,7 +89,7 @@
         </v-card-title>
         <v-container>
         <v-card-text>
-          <v-select v-if="tipo!=='PROCESOS'" v-model="tipo" :items="tipoAlerta" :error-messages="errors" label="Tipo" data-vv-name="select" required></v-select>
+          <v-select  v-model="tipo" :items="tipoAlerta" :error-messages="errors" label="Tipo" data-vv-name="select" required></v-select>
         </v-card-text>
         <v-card-text>
           <v-select v-if="tipo==='CPU'" v-model="tipoElemento" :items="tiposCPU" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
@@ -100,10 +98,10 @@
 
         </v-card-text>
         <v-card-text>
-          <v-select v-if="tipo!=='PROCESOS'" v-model="limite" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
+          <v-select v-if="tipo!=='PROCESOS' && tipo!=='SERVICIOS'" v-model="limite" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
         </v-card-text>
 
-         <v-card-text v-if="tipo!=='PROCESOS'">
+         <v-card-text v-if="tipo!=='PROCESOS' && tipo!=='SERVICIOS'">
            <div>VALOR (%)</div>
            <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valor="valor"></v-text-field>
         </v-card-text>
@@ -111,9 +109,17 @@
            <div>NUM PROCESOS</div>
            <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valor="valor"></v-text-field>
         </v-card-text>
+         <v-card-text v-if="tipo==='SERVICIOS'">
+           <div>CONTROLAR CAIDA DE UN SERVICIO</div>
+           <v-btn color="blue darken-20" text @click="recuperarServiciosParaMonitorizar">Ver servicios</v-btn>
+        </v-card-text>
        
         <v-card-text>
-          <v-text-field v-model="descripcion" label="Descripción" outlined required></v-text-field>
+          <v-text-field v-if="tipo!=='SERVICIOS'"  v-model="descripcion" label="Descripción" outlined required></v-text-field>
+        </v-card-text>
+
+        <v-card-text>
+          <v-text-field v-if="tipo==='SERVICIOS'" disabled v-model="descripcion" label="Servicio seleccionado" outlined required></v-text-field>
         </v-card-text>
 
         <v-card-text>
@@ -140,18 +146,24 @@
         </v-card-title>
         <v-container>
         <v-card-text>
-          <v-select v-model="tipoModifica" :items="tipoAlerta" :error-messages="errors" label="Tipo" data-vv-name="select" required></v-select>
+          <v-select v-model="tipoModifica" disabled="true" :items="tipoAlerta" :error-messages="errors" label="Tipo" data-vv-name="select" required></v-select>
         </v-card-text>
         <v-card-text>
-          <v-select v-if="tipo==='CPU'" v-model="tipoElementoModifica" :items="tiposCPU" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
+          <v-select v-if="tipoModifica==='CPU'" v-model="tipoElementoModifica" :items="tiposCPU" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
+          <v-select v-if="tipoModifica==='RAM'" v-model="tipoElementoModifica" :items="tiposRAM" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
+          <v-select v-if="tipoModifica==='DISCO'" v-model="tipoElementoModifica" :items="tiposDISCO" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
         </v-card-text>
         <v-card-text>
-          <v-select v-model="limiteModifica" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
+          <v-select v-if="tipoModifica!=='PROCESOS'" v-model="limiteModifica" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
         </v-card-text>
-         <v-card-text>
+         <v-card-text v-if="tipoModifica!=='PROCESOS'">
            <div>VALOR (%)</div>
            <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valorModifica="valorModifica"></v-text-field>
         </v-card-text>
+        <v-card-text v-if="tipoModifica==='PROCESOS'">
+           <div>NUM PROCESOS</div>
+           <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valorModifica="valorModifica"></v-text-field>
+           </v-card-text>
         <v-card-text>
           <v-text-field v-model="descripcionModifica" label="Descripción" outlined required></v-text-field>
         </v-card-text>
@@ -169,6 +181,28 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+
+
+    <!--VER SERVICIOS-->
+      <v-dialog width="1000" v-model="boolVerServicios">
+        <v-container class="grey lighten-2" id="regular-tables-view" fluid tag="section">
+            <v-card>SERVICIOS</v-card>
+            <view-intro heading="Simple Tables" link="components/simple-tables"/>
+            <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
+            <v-data-table v-model="servicioParaMonitorizarSeleccionado"  :headers="cabecerasServiciosParaMonitorizar" :items="serviciosParaMonitorizar" :single-select="true" item-key="Nombre" show-select   class="elevation-1">
+                <template v-slot:top>
+                </template>
+                </v-data-table>
+                <div class="py-3" />
+            </material-card>
+            <v-btn color="red darken-1" text @click="boolVerServicios=false">CERRAR</v-btn>
+            <v-btn color="green darken-1" text @click="comprobarServiciosSeleccionados">ACEPTAR</v-btn>
+            </v-container>
+      </v-dialog>
+
+
+
 
      <!--DIÁLOGO MENSAJE DE ÉXITO-->
       <v-dialog width="500" v-model="flagExitoCrearAlerta">
@@ -294,6 +328,7 @@
         boolNuevaAlerta: false,
         boolConfirmacionBorrarAlerta:false,
         boolConfirmacionModificarAlerta:false,
+        boolVerServicios:false,
         flagExitoCrearAlerta:false,
         flagExitoEliminarAlerta: false,
         flagModificaAlerta:false,
@@ -302,13 +337,16 @@
         descripcion:'',
         alertas:[],
         avisos:[],
+        serviciosParaMonitorizar:[],
         alertaSeleccionada:[],
         avisoSeleccionados:[],
+        servicioParaMonitorizarSeleccionado:[],
         error: '',
         tipo: '',
         tipoElemento:'',
         valor: 0,
         limite: '', 
+        sistemaServicio:'',
 
         descripcionModifica:'',
         tipoModifica: '',
@@ -333,11 +371,17 @@
           {text: 'Fecha / Hora', value: "Fecha"},
           {text: 'Estado', value: "Estado"},
         ],
+        cabecerasServiciosParaMonitorizar:[
+          {text: 'Nombre', value: "Nombre"},
+          {text: 'Descripcón',value: "Descripcion"},
+          {text: 'Sistema',value: "SO"},
+          ],
         tipoAlerta: [
           'CPU',
           'RAM',
           'PROCESOS',
           'DISCO',
+          'SERVICIOS'
         ],
         Limites: [
           'Supera',
@@ -426,6 +470,7 @@
               Limite:"Supera",
               Tipo: this.tipo,
               IdEmpresa:idEmpresa,
+              TipoElemento:"-"
             });
 
           console.log("Se registró la alerta: ", docRef.id);
@@ -440,7 +485,34 @@
             console.error("Error adding document: ", e);
           }
 
-        }else{
+        }else if(this.tipo=="SERVICIOS" && this.descripcion){
+
+          try {
+            const docRef = await addDoc(collection(firebaseDB, "Alertas"), {
+              Descripcion: this.servicioParaMonitorizarSeleccionado[0].Descripcion,
+              IdAdmin: auth.currentUser.uid,
+              Valor: "false",
+              Tipo: this.tipo,
+              TipoElemento:this.descripcion,
+              IdEmpresa:idEmpresa,
+              Sistema: this.sistemaServicio,
+              Limite: "-",
+            });
+
+          console.log("Se registró la alerta: ", docRef.id);
+
+          await updateDoc(docRef, {
+            IdAlerta: docRef.id
+          });
+
+          this.boolNuevaAlerta=false;
+          this.flagExitoCrearAlerta=true;
+          } catch (e) {
+            console.error("Error adding document: ", e);
+          }
+
+        }
+        else{
           console.log("Hay campos vacíos");
           this.error="Hay campos vacíos";
         }
@@ -490,7 +562,12 @@
         const consulta=query(collection(firebaseDB, "Alertas"),where("IdAlerta", "==",this.alertaSeleccionada[0].IdAlerta));
         const querySnapshot = await getDocs(consulta);
 
-        querySnapshot.forEach(async(doc) => {
+        
+
+
+        if(this.descripcionModifica && this.tipoModifica && this.valorModifica && this.limiteModifica && this.tipoElementoModifica){ //Almacenamos en la base de datos la nueva alerta
+          
+          querySnapshot.forEach(async(doc) => {
           await updateDoc(doc.ref, {
             Descripcion: this.descripcionModifica,
             Valor: this.valorModifica,
@@ -501,6 +578,25 @@
         });
 
         this.flagExitoModificarAlerta=true;
+
+        }
+        else if(this.tipoModifica=="PROCESOS" && this.descripcionModifica){
+           querySnapshot.forEach(async(doc) => {
+          await updateDoc(doc.ref, {
+            Descripcion: this.descripcionModifica,
+            Valor: this.valorModifica,
+            Limite: "Supera",
+            Tipo: this.tipoModifica,
+          });
+        });
+
+        this.flagExitoModificarAlerta=true;
+
+        }else{
+          console.log("Hay campos vacíos");
+          this.error="Hay campos vacíos";
+        }
+
       },
       /** Método encargado de recargar la página tras la modificación de avisos o alertas para que se muestren los cambios
        * @public
@@ -573,6 +669,33 @@
           aviso.Fecha += '-'+ await fechita.getMonth();
           aviso.Fecha += '-' + await fechita.getFullYear();
         });
+      },
+
+      async recuperarServiciosParaMonitorizar(){
+        
+        this.serviciosParaMonitorizar=[];
+        const firebaseDB= getFirestore(firebaseApp);
+        const consulta =  query(collection(firebaseDB, "ServiciosSO"));
+        const querySnapshot = await getDocs(consulta);
+        
+        querySnapshot.forEach((doc) => {
+          this.serviciosParaMonitorizar.push(doc.data());
+        });
+        
+        
+        
+        this.boolVerServicios=true
+      },
+      /** Método encargado de controlar la acción que buscamos llevar a cabo con una alerta seleccionada, ya sea 
+       * eliminarla o modificarla
+       * @param {Number} opcion Valor utilizado como flag en función del botón pulsado
+       * @public
+       */
+      comprobarServiciosSeleccionados(){
+        this.boolVerServicios=false;
+        if(this.servicioParaMonitorizarSeleccionado[0]){
+          this.descripcion=this.servicioParaMonitorizarSeleccionado[0].Nombre;
+        }
       },
     },
     mounted(){

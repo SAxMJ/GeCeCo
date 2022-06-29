@@ -25,14 +25,14 @@
                                  placeholder="Contraseña"
                                  required
                               ></v-text-field>
-                               <router-link to="/paginainicio">
                                  <v-btn @click="loginUsuario" class="mt-4"  dark color="secondary" value="login">LOGIN</v-btn>
-                              </router-link>
                            </form>
                         </v-card-text>
+                           <v-card-text>
                            <v-alert dense outlined type="error" v-if="error">
                               {{error}}
                            </v-alert>
+                           </v-card-text>
                      </v-card>
                      </v-tab-item>
                </v-tabs>
@@ -78,11 +78,13 @@ export default({
                signInWithEmailAndPassword(auth,this.correo,this.password).then((userCredential)=>{
                   const user=userCredential.user;
                   console.log(user);
+                  this.$router.push('/paginainicio');
 
                }).catch((error)=>{
                   const errorCode=error.errorCode;
                   const errorMesage=error.message;
 
+                  this.error="Credenciales incorrectas"
                   console.log(errorCode);
                   console.log(errorMesage);
                })

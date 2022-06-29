@@ -2,11 +2,33 @@
    <v-main>
        <div>
         <v-container class="grey lighten-4">
+
+           <v-container fluid pa-0>
+            <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+              <v-row align="center" justify="center" 
+                  style="height:100vh" dense>
+                  <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                          <v-card-text  class="text-h5 font-weight-bold white--text">REGISTRO DE SUPER USUARIO</v-card-text>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                      <v-card class="transparent" flat tile>
+                      </v-card>
+                  </v-col>
+                  <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                  </v-col>
+              </v-row>
+            </v-img>
+        </v-container>
+
             <v-card elevation="24" shaped tile>
               <!--DIÁLOGO DE REGISTRO DE UN USUARIO PARA UNA EMPRESA-->
-         <v-tabs dark color="primary">
-            <v-tab>Registrar SuperUsuario</v-tab>
-                <v-tab-item>
+        
                 <v-card>
                 <v-card-text>
                     <form>
@@ -23,8 +45,7 @@
                     </v-alert>
                 </v-card-text>
                 </v-card>
-            </v-tab-item>
-        </v-tabs>
+            
             </v-card>
 
         <!--DIÁLOGO MENSAJE DE CONFIRMACION ALTA-->
@@ -58,6 +79,23 @@
           </v-card>
       </template>
       </v-dialog> 
+
+      <!--DIÁLOGO MENSAJE DE ERROR-->
+      <v-dialog width="500" v-model="boolExistente">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-alert dense outlined type="error">ERROR</v-alert>
+              </v-card-title>
+              <v-card-text>
+                  <v-text >Ya existe un usuario con este email asociado</v-text>
+
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="boolExistente=false">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog> 
+
        <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
     </v-container>
    </div>
@@ -93,6 +131,7 @@ export default({
          boolConfirmacionAlta:false,
          error:"",
          flagexito:false,
+         boolExistente:false,
       }
    },components:{
       BarraLateralSuperUsu
@@ -115,6 +154,8 @@ export default({
                
                const registrarTrabajador=httpsCallable(functions,"registrarTrabajador");
                registrarTrabajador({usuario: this.correoSuper, pass: password}).then(async(resultado)=> {
+
+                   if(resultado.data != "0"){ 
                     console.log("ELUIDDDD es "+resultado.data);
                     await sendPasswordResetEmail(getAuth(),this.correoSuper);
                      //UNA VEZ EL USUARIO HA SIDO REGISTRADO LE ASIGNAMOS UN ROL Y LO AÑADIMOS A LA TABLA DE RolUser
@@ -149,6 +190,9 @@ export default({
                           console.error("Error adding document: ", e);
                       }
                     });
+               }else{
+                 this.boolExistente=true;
+               }
                });
             }
             else{

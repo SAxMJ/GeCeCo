@@ -2,7 +2,28 @@
 <v-main > 
     <div>
         <v-container class="grey lighten-4">
-        <v-card class="blue lighten-3">VER EQUIPO</v-card>
+        <v-container fluid pa-0>
+      <v-img width="1740px" height="100px" small  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" class="white--text align-center justify-center " src="../../images/adornoTerminal3.jpg">
+        <v-row align="center" justify="center" 
+            style="height:100vh" dense>
+            <v-col cols="12" lg="2" md="2" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card flat tile>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="7" md="7" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card class="transparent" flat tile>
+                    <v-card-text  class="text-h5 font-weight-bold white--text">VER EQUIPO</v-card-text>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+                <v-card class="transparent" flat tile>
+                </v-card>
+            </v-col>
+            <v-col cols="12" lg="1" md="1" class="transparent fill-height d-flex flex-column justify-center align-center">
+            </v-col>
+        </v-row>
+      </v-img>
+  </v-container>
         
         <v-container>
         <v-row rows="12" md="6">
@@ -145,7 +166,7 @@
         </template>
         </v-dialog> 
 
-        <!--VER SERVICIOS-->
+      <!--VER SERVICIOS-->
       <v-dialog width="1000" v-model="boolVerServicios">
         <v-container class="grey lighten-2" id="regular-tables-view" fluid tag="section">
             <v-card>SERVICIOS Y PROCESOS</v-card>

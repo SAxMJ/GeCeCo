@@ -18,22 +18,6 @@
         <v-list-item class="px-2" dark>
         <v-list-item-avatar>
           <v-img :src="fotourl">
-           <div class="text-center">
-                <v-menu offset-y>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="transparent" dark v-bind="attrs" v-on="on"></v-btn>
-                  </template>
-                  <v-list dark>
-                    <v-list-item
-                      v-for="(opciones, index) in opciones"
-                      :key="index"
-                      @click="cerrarSesion"
-                    >
-                      <v-list-item-title>{{ opciones.title }}</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </div>
           </v-img>
         </v-list-item-avatar>
 

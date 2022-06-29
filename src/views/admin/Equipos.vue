@@ -79,6 +79,23 @@
           </v-card>
       </template>
       </v-dialog>
+
+      <!--DIÁLOGO MENSAJE DE ERROR-->
+      <v-dialog width="500" v-model="boolExistente">
+      <template>
+          <v-card>
+              <v-card-title class="justify-center">
+                <v-alert dense outlined type="error">ERROR</v-alert>
+              </v-card-title>
+              <v-card-text>
+                  <v-text >El email introducido ya se encuentra asociado a un equipo</v-text>
+
+              </v-card-text>
+              <v-btn color="red darken-1" text @click="boolExistente=false">ACEPTAR</v-btn>
+          </v-card>
+      </template>
+      </v-dialog> 
+
     <BarraLateralAdmin v-if = "rol==2"></BarraLateralAdmin>
     <BarraLateralSuperUsu v-if = "rol==3"></BarraLateralSuperUsu>
 
@@ -91,7 +108,8 @@
   import {getFirestore, collection, updateDoc,doc, deleteDoc, setDoc} from "firebase/firestore"
   import firebaseApp from '../../scripts/firebase'
   import { getAuth} from "firebase/auth";
-  import {query, where, getDocs,addDoc} from "firebase/firestore";
+  import {query, where, getDocs,addDoc,getDoc} from "firebase/firestore";
+
 
   /** Vista de la aplicación encargada de mostrar todos los equipos registrados para los usuarios de la empresa, permitirá
   * también acceder a la información correspondiente de un equipo y añadir o registrar nuevos equipos
@@ -118,6 +136,7 @@
         flagExitoCrearEquipo:false,
         correoRegistroEquipo:"",
         nombreEquipo:"",
+        boolExistente:false,
       }
       },
     components:{
@@ -163,36 +182,43 @@
        */
       async nuevoEquipo(){
        
-        const firebaseDB= getFirestore(firebaseApp);
-
+        var firebaseDB= getFirestore(firebaseApp);
         const consulta =  query(collection(firebaseDB, "RolUser"), where("Correo", "==", this.correoRegistroEquipo));
         const querySnapshot = await getDocs(consulta);
           querySnapshot.forEach((doc) => {
             this.idUsuarioNuevoEquipo=doc.get("UID");
-            
           });
           
         var idNuevoEquipo=this.idEmpresa+""+this.idUsuarioNuevoEquipo;
-
+      
         if(this.correoRegistroEquipo && this.nombreEquipo){
-          this.error="";
-          try {
-              
-              //Creamos el nuevo documento de equipos
-              await setDoc(doc(firebaseDB, "Equipos", idNuevoEquipo),{
-                IdEmpresa: this.idEmpresa,
-                IdUsuario: this.idUsuarioNuevoEquipo,
-                CorreoTrabajador: this.correoRegistroEquipo,
-                NombreEquipo: this.nombreEquipo
-              })
 
-              const docRef = await addDoc(collection(firebaseDB, "Equipos",idNuevoEquipo,"Monitorizacion"), {
-              });              
-             
-              this.flagExitoCrearEquipo=true;
-              console.log("Se registró el equipo: ", docRef.id);
-            } catch (e) {
-              console.error("Error adding document: ", e);
+          const docRef= doc(firebaseDB, 'Equipos', ""+idNuevoEquipo)
+		      const querySnapshot = await getDoc(docRef);
+          
+          if(querySnapshot.exists()){
+            this.boolExistente=true;
+          }
+          else{
+            this.error="";
+            try {
+                
+                //Creamos el nuevo documento de equipos
+                await setDoc(doc(firebaseDB, "Equipos", idNuevoEquipo),{
+                  IdEmpresa: this.idEmpresa,
+                  IdUsuario: this.idUsuarioNuevoEquipo,
+                  CorreoTrabajador: this.correoRegistroEquipo,
+                  NombreEquipo: this.nombreEquipo
+                })
+
+                const docRef = await addDoc(collection(firebaseDB, "Equipos",idNuevoEquipo,"Monitorizacion"), {
+                });              
+              
+                this.flagExitoCrearEquipo=true;
+                console.log("Se registró el equipo: ", docRef.id);
+              } catch (e) {
+                console.error("Error adding document: ", e);
+              }
             }
         }else{
           this.error="Debes rellenar ambos campos"
