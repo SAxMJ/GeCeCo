@@ -110,13 +110,11 @@
             <v-container id="regular-tables-view" fluid tag="section">
             <v-card class="blue lighten-4">ALERTAS GENERADAS POR EL EQUIPO</v-card>
             <view-intro heading="Simple Tables" link="components/simple-tables"/>
-            <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
             <v-data-table  :headers="cabecerasAvisos" :items="avisos" :single-select="true" item-key="IdAlerta"  class="elevation-1">
                 <template v-slot:top>
                 </template>
                 </v-data-table>
                 <div class="py-3" />
-            </material-card>
             <div class="py-3" />
             </v-container>
         </v-row>
@@ -125,13 +123,11 @@
             <v-container id="regular-tables-view" fluid tag="section">
             <v-card class="blue lighten-4">HISTORIAL DE LECTURAS</v-card>
             <view-intro heading="Simple Tables" link="components/simple-tables"/>
-            <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
             <v-data-table  :headers="cabecerasHistorico" :items="historicoMonit" :single-select="true" item-key="IdAlerta"  class="elevation-1">
                 <template v-slot:top>
                 </template>
                 </v-data-table>
                 <div class="py-3" />
-            </material-card>
             <div class="py-3" />
             </v-container>
         </v-row>
@@ -171,13 +167,11 @@
         <v-container class="grey lighten-2" id="regular-tables-view" fluid tag="section">
             <v-card>SERVICIOS Y PROCESOS</v-card>
             <view-intro heading="Simple Tables" link="components/simple-tables"/>
-            <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
             <v-data-table  :headers="cabecerasServicios" :items="serviciosyprocesos" :single-select="true"   class="elevation-1">
                 <template v-slot:top>
                 </template>
                 </v-data-table>
                 <div class="py-3" />
-            </material-card>
             <v-btn color="red darken-1" text @click="boolVerServicios=false">CERRAR</v-btn>
             </v-container>
       </v-dialog>

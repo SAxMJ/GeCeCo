@@ -30,14 +30,14 @@
           <v-list-item-icon >
             <v-icon v-if="item.title!=='Alertas' && item.title!=='Tickets'">{{ item.icon }}</v-icon>
             
-            <v-badge v-if="item.title==='Alertas'" v-model="show" color="orange"  right>
+            <v-badge v-if="item.title==='Alertas'"  color="orange"  right>
               <template   v-slot:badge>
                 <span>{{nAvisos}}</span>
               </template>
               <v-icon >{{ item.icon }}</v-icon>
             </v-badge>
 
-            <v-badge v-if="item.title==='Tickets'" v-model="show" color="lime"  right>
+            <v-badge v-if="item.title==='Tickets'"  color="lime"  right>
               <template   v-slot:badge>
                 <span>{{nTickets}}</span>
               </template>

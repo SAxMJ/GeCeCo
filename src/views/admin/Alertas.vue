@@ -34,13 +34,11 @@
         </v-container>
 
         <view-intro heading="Simple Tables" link="components/simple-tables"/>
-        <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
         <v-data-table  v-model="alertaSeleccionada" :headers="cabeceras" :items="alertas" :single-select="true" item-key="IdAlerta" show-select class="elevation-1">
             <template v-slot:top>
             </template>
             </v-data-table>
             <div class="py-3" />
-        </material-card>
         <div class="py-3" />
       </v-container>
       
@@ -70,13 +68,11 @@
             </v-img>
         </v-container>
           <view-intro heading="Simple Tables" link="components/simple-tables"/>
-          <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
           <v-data-table  v-model="avisoSeleccionados" :headers="cabecerasAvisos" :items="avisos" :single-select="true" item-key="IdAviso" show-select class="elevation-1">
               <template v-slot:top>
               </template>
               </v-data-table>
               <div class="py-3" />
-          </material-card>
           <div class="py-3" />
         </v-container>
     </v-card>
@@ -110,7 +106,7 @@
            <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valor="valor"></v-text-field>
         </v-card-text>
          <v-card-text v-if="tipo==='SERVICIOS'">
-           <div>CONTROLAR CAIDA DE UN SERVICIO</div>
+           <div>CONTROLAR CAÍDA DE UN SERVICIO</div>
            <v-btn color="blue darken-20" text @click="recuperarServiciosParaMonitorizar">Ver servicios</v-btn>
         </v-card-text>
        
@@ -154,18 +150,29 @@
           <v-select v-if="tipoModifica==='DISCO'" v-model="tipoElementoModifica" :items="tiposDISCO" :error-messages="errors" label="Seleccionar" data-vv-name="select" required></v-select>
         </v-card-text>
         <v-card-text>
-          <v-select v-if="tipoModifica!=='PROCESOS'" v-model="limiteModifica" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
+          <v-select v-if="tipoModifica!=='PROCESOS' && tipoModifica!=='SERVICIOS'" v-model="limiteModifica" :items="Limites" :error-messages="errors" label="Limite" data-vv-name="select" required></v-select>
         </v-card-text>
-         <v-card-text v-if="tipoModifica!=='PROCESOS'">
+         <v-card-text v-if="tipoModifica!=='PROCESOS' && tipoModifica!=='SERVICIOS'">
            <div>VALOR (%)</div>
            <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valorModifica="valorModifica"></v-text-field>
         </v-card-text>
-        <v-card-text v-if="tipoModifica==='PROCESOS'">
+        <v-card-text v-if="tipoModifica==='PROCESOS' ">
            <div>NUM PROCESOS</div>
            <v-text-field type="number" step="any" min="0" ref="input" :rules="[numberRule]" v-model.valorModifica="valorModifica"></v-text-field>
            </v-card-text>
         <v-card-text>
-          <v-text-field v-model="descripcionModifica" label="Descripción" outlined required></v-text-field>
+          <v-text-field v-if="tipoModifica!=='SERVICIOS'" v-model="descripcionModifica" label="Descripción" outlined required></v-text-field>
+        </v-card-text>
+
+        <v-card-text>
+          <v-text-field v-if="tipoModifica==='SERVICIOS'" disabled v-model="descripcionModifica" label="Servicio seleccionado" outlined required></v-text-field>
+        </v-card-text>
+        
+        <v-card-text>
+           <v-alert dense outlined type="info" v-if="tipoModifica==='SERVICIOS'">
+            Las alertas de servicio no pueden ser modificadas
+          </v-alert>
+        
         </v-card-text>
 
         <v-card-text>
@@ -189,13 +196,11 @@
         <v-container class="grey lighten-2" id="regular-tables-view" fluid tag="section">
             <v-card>SERVICIOS</v-card>
             <view-intro heading="Simple Tables" link="components/simple-tables"/>
-            <material-card icon="mdi-clipboard-text" icon-small title="Simple Table" color="accent" >
             <v-data-table v-model="servicioParaMonitorizarSeleccionado"  :headers="cabecerasServiciosParaMonitorizar" :items="serviciosParaMonitorizar" :single-select="true" item-key="Nombre" show-select   class="elevation-1">
                 <template v-slot:top>
                 </template>
                 </v-data-table>
                 <div class="py-3" />
-            </material-card>
             <v-btn color="red darken-1" text @click="boolVerServicios=false">CERRAR</v-btn>
             <v-btn color="green darken-1" text @click="comprobarServiciosSeleccionados">ACEPTAR</v-btn>
             </v-container>
@@ -329,6 +334,7 @@
         boolConfirmacionBorrarAlerta:false,
         boolConfirmacionModificarAlerta:false,
         boolVerServicios:false,
+        boolExito:false,
         flagExitoCrearAlerta:false,
         flagExitoEliminarAlerta: false,
         flagModificaAlerta:false,
@@ -527,13 +533,17 @@
           if(opcion===1){ //Si la opcion es 1 entonces queremos borrar la alreta
             this.boolConfirmacionBorrarAlerta=true;
           }else if(opcion===2){ //Si la opcion es 2 entonces queremos modificar la alerta
-          this.descripcionModifica=this.alertaSeleccionada[0].Descripcion;
-          this.tipoModifica=this.alertaSeleccionada[0].Tipo
-          this.tipoElementoModifica=this.alertaSeleccionada[0].TipoElemento
-          this.valorModifica=this.alertaSeleccionada[0].Valor;
-          this.limiteModifica=this.alertaSeleccionada[0].Limite;
-          
-          this.flagModificaAlerta=true;
+            if(this.alertaSeleccionada[0].Tipo!="SERVICIOS"){
+              this.descripcionModifica=this.alertaSeleccionada[0].Descripcion;
+              this.tipoModifica=this.alertaSeleccionada[0].Tipo
+              this.tipoElementoModifica=this.alertaSeleccionada[0].TipoElemento
+              this.valorModifica=this.alertaSeleccionada[0].Valor;
+              this.limiteModifica=this.alertaSeleccionada[0].Limite;
+            }else{ //Representación de alerta de servicios al modificar
+              this.descripcionModifica=this.alertaSeleccionada[0].TipoElemento;
+              this.tipoModifica=this.alertaSeleccionada[0].Tipo
+            }        
+            this.flagModificaAlerta=true;
           }
         }
       },
